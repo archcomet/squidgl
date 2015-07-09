@@ -1,6 +1,7 @@
 
 require.config({
 	paths: {
+		'animate': 'libs/animate',
 		'THREE': 'libs/three.min',
 		'glsl': 'libs/glsl'
 	},
@@ -13,6 +14,7 @@ require.config({
 
 require([
 	'THREE',
+	'animate',
 	'glsl!shaders/eyeball_vertex',
 	'glsl!shaders/eyeball_fragment',
 	'glsl!shaders/curve_vertex',
@@ -20,7 +22,7 @@ require([
 	'glsl!shaders/curvefill_vertex',
 	'glsl!shaders/curvefill_fragment'
 
-], function (THREE, eyeball_vertex, eyeball_fragment, curve_vertex, curve_fragment, curvefill_vertex, curvefill_fragment) {
+], function (THREE, ANIM, eyeball_vertex, eyeball_fragment, curve_vertex, curve_fragment, curvefill_vertex, curvefill_fragment) {
 
 	var eyeballShaderMaterial, curveShaderMaterial, curveFillShaderMaterial;
 	var renderer, scene, camera;
@@ -35,8 +37,9 @@ require([
 	initScene();
 	initMouse();
 	initShaders();
-	initEyeballs();
+	//initEyeballs();
 	//initCurveGeometry();
+	initCurveGeometry2();
 
 	animate();
 
@@ -173,6 +176,7 @@ require([
 		return last * ((offset*=sign)<0) + offset;
 	}
 
+	// Experiments in fragment shader based curves with limited tessellation
 	function initCurveGeometry() {
 
 		var points = [
@@ -275,7 +279,46 @@ require([
 		scene.add(mesh);
 
 		//debugLines(mesh, points, 0x00ff00);
-		//debugLines(mesh, cps, 0xff0000);
+	}
+
+
+	// experiments in tessellated curves
+
+	function initCurveGeometry2() {
+
+		var segments = 20,
+			length = -200.0;
+
+		var i, n, t;
+		var controlPoints = new Array(segments);
+		var animations = new Array(segments);
+
+		for (i = 0, n = segments; i < n; ++i) {
+			t = i / (n-1);
+			controlPoints[i] = new THREE.Vector3(0.0, length * t, 0.0);
+			animations[i] = ANIM(controlPoints[i])
+				.from({
+					x: 0
+				})
+				.to({
+					x: 20 + 150 * t
+				})
+				.duration(700)
+				.delay(300 * t*t)
+				.using(ANIM.easing.bell5)
+		}
+
+		// animation
+		var lineMesh = debugLines(scene, controlPoints, 0xffffff);
+			lineMesh.geometry.dynamic = true;
+
+		ANIM.group(animations)
+			.repeat(Infinity)
+			.progress(function() {
+				lineMesh.geometry.verticesNeedUpdate = true;
+			})
+			.start();
+
 	}
 
 	function debugLines(parent, vertices, color) {
@@ -288,6 +331,8 @@ require([
 		lineMesh.position.z = 1;
 
 		parent.add(lineMesh);
+
+		return lineMesh;
 
 	}
 
