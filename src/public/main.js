@@ -16,11 +16,13 @@ require([
 	'glsl!shaders/eyeball_vertex',
 	'glsl!shaders/eyeball_fragment',
 	'glsl!shaders/curve_vertex',
-	'glsl!shaders/curve_fragment'
+	'glsl!shaders/curve_fragment',
+	'glsl!shaders/curvefill_vertex',
+	'glsl!shaders/curvefill_fragment'
 
-], function (THREE, eyeball_vertex, eyeball_fragment, curve_vertex, curve_fragment) {
+], function (THREE, eyeball_vertex, eyeball_fragment, curve_vertex, curve_fragment, curvefill_vertex, curvefill_fragment) {
 
-	var eyeballShaderMaterial, curveShaderMaterial;
+	var eyeballShaderMaterial, curveShaderMaterial, curveFillShaderMaterial;
 	var renderer, scene, camera;
 
 	var WIDTH = window.innerWidth,
@@ -98,6 +100,14 @@ require([
 			fragmentShader: curve_fragment,
 			transparent: true
 		});
+
+		curveFillShaderMaterial = new THREE.ShaderMaterial({
+			uniforms: {
+				uColor: {type:'c', value: new THREE.Color(0xffaa00)}
+			},
+			vertexShader: curvefill_vertex,
+			fragmentShader: curvefill_fragment
+		});
 	}
 
 	function createEyeball(position, radius, strokeWidth, color) {
@@ -154,11 +164,18 @@ require([
 		}
 	}
 
+	function getSign(v1, v2, v3) {
+		var z = (v2.x - v1.x) * (v3.y - v1.y) - (v2.y - v1.y) * (v3.x - v1.x);
+		return z / Math.abs(z);
+	}
+
+	function getIndex(offset, last, sign) {
+		return last * ((offset*=sign)<0) + offset;
+	}
+
 	function initCurveGeometry() {
 
 		var points = [
-
-			// 0
 			new THREE.Vector3(0.0, 	 0.0, 0.0),
 			new THREE.Vector3(50.0,  50.0, 0.0),
 			new THREE.Vector3(100.0, 50.0, 0.0),
@@ -176,33 +193,29 @@ require([
 		];
 
 		var geometry = new THREE.Geometry(),
-			material = curveShaderMaterial.clone(),
-			mesh = new THREE.Mesh(geometry, material);
+			material0 = curveShaderMaterial.clone(),
+			material1 = curveFillShaderMaterial.clone(),
+			materials = new THREE.MeshFaceMaterial([material0, material1]),
+			mesh = new THREE.Mesh(geometry, materials);
 
+		material0.side = THREE.DoubleSide;
 
-		var cps = [points[0]];
-
-
-		material.side = THREE.DoubleSide;
-
-		var a, b, fi, i, n;
+		var a, b, c, d, e, fi, i, n, last, sign;
 
 		geometry.vertices.push(points[0]);
 
 		for (i = 1, n = points.length - 1; i < n; ++i) {
 
 			fi = (i-1) * 2;
-
 			a = points[i];
 			b = points[i+1];
 
 			if (i < n-1) {
 				b = new THREE.Vector3((a.x + b.x) * 0.5, (a.y + b.y) * 0.5, 0);
-				cps.push(b);
 			}
 
 			geometry.vertices.push(a, b);
-			geometry.faces.push(new THREE.Face3(fi, fi + 1, fi + 2));
+			geometry.faces.push(new THREE.Face3(fi, fi + 1, fi + 2, undefined, undefined, 0));
 			geometry.faceVertexUvs[0].push([
 				new THREE.Vector2(0.0, 0.0),
 				new THREE.Vector2(0.5, 0.0),
@@ -210,11 +223,59 @@ require([
 			]);
 		}
 
-		cps.push(points[0]);
+		var vertices = geometry.vertices;
+
+		i = 1;
+		n = (vertices.length - 1) / 4 - 1;
+		last = vertices.length - 1;
+		sign = getSign(vertices[0], vertices[2], vertices[1]);
+
+		a = getIndex(0, last, sign);
+		b = getIndex(1, last, sign);
+		c = getIndex(2, last, sign);
+		d = getIndex(-2, last, sign);
+
+			geometry.faces.push(new THREE.Face3(a, b, d, undefined, undefined, 1));
+			geometry.faces.push(new THREE.Face3(b, c, d, undefined, undefined, 1));
+
+		for (; i < n; ++i) {
+
+			a = 2*i;
+			b = a+1;
+			c = -a;
+			d = -(a+2);
+			e = a+2;
+
+			sign = getSign(vertices[a], vertices[e], vertices[b]);
+
+			a = getIndex(a, last, sign);
+			b = getIndex(b, last, sign);
+			c = getIndex(c, last, sign);
+			d = getIndex(d, last, sign);
+			e = getIndex(e, last, sign);
+
+			if (sign > 0) {
+				geometry.faces.push(new THREE.Face3(a, b, c, undefined, undefined, 1));
+				geometry.faces.push(new THREE.Face3(c, b, d, undefined, undefined, 1));
+				geometry.faces.push(new THREE.Face3(d, b, e, undefined, undefined, 1));
+			}
+			else {
+				geometry.faces.push(new THREE.Face3(a, c, b, undefined, undefined, 1));
+				geometry.faces.push(new THREE.Face3(c, d, b, undefined, undefined, 1));
+				geometry.faces.push(new THREE.Face3(d, e, b, undefined, undefined, 1));
+			}
+		}
+
+		a = 2*i;
+		b = 2*i + 2;
+		c = 2*i + 4;
+
+		geometry.faces.push(new THREE.Face3(a, b, c, undefined, undefined, 1));
+
 		scene.add(mesh);
 
-		debugLines(mesh, points, 0x00ff00);
-		debugLines(mesh, cps, 0xff0000);
+		//debugLines(mesh, points, 0x00ff00);
+		//debugLines(mesh, cps, 0xff0000);
 	}
 
 	function debugLines(parent, vertices, color) {

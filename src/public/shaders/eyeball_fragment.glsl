@@ -1,8 +1,4 @@
 
-#ifdef GL_ES
-precision highp float;
-#endif
-
 uniform float uRadius;
 uniform vec3 uColor;
 uniform vec3 uStroke;
