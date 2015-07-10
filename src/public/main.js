@@ -20,11 +20,17 @@ require([
 	'glsl!shaders/curve_vertex',
 	'glsl!shaders/curve_fragment',
 	'glsl!shaders/curvefill_vertex',
-	'glsl!shaders/curvefill_fragment'
+	'glsl!shaders/curvefill_fragment',
+	'glsl!shaders/tentacle_vertex',
+	'glsl!shaders/tentacle_fragment'
 
-], function (THREE, ANIM, eyeball_vertex, eyeball_fragment, curve_vertex, curve_fragment, curvefill_vertex, curvefill_fragment) {
+], function (
+	THREE, ANIM, eyeball_vertex, eyeball_fragment,
+	curve_vertex, curve_fragment, curvefill_vertex, curvefill_fragment,
+	tentacle_vertex, tentacle_fragment
+) {
 
-	var eyeballShaderMaterial, curveShaderMaterial, curveFillShaderMaterial;
+	var eyeballShaderMaterial, curveShaderMaterial, curveFillShaderMaterial, tentacleShaderMaterial;
 	var renderer, scene, camera;
 
 	var WIDTH = window.innerWidth,
@@ -111,6 +117,16 @@ require([
 			vertexShader: curvefill_vertex,
 			fragmentShader: curvefill_fragment
 		});
+
+		tentacleShaderMaterial = new THREE.ShaderMaterial({
+			uniforms: {
+				uColor: {type:'c', value: new THREE.Color(0xffaa00)},
+				uWidth: {type:'f', value: 25.0 },
+				uControlPoints: { type:'v3v', value:[]}
+			},
+			vertexShader: tentacle_vertex,
+			fragmentShader: tentacle_fragment
+		})
 	}
 
 	function createEyeball(position, radius, strokeWidth, color) {
@@ -286,16 +302,34 @@ require([
 
 	function initCurveGeometry2() {
 
-		var segments = 20,
-			length = -200.0;
+		var segments = 19, width = 50, length = 200.0;
+
+		var geometry = new THREE.Geometry(),
+			material = tentacleShaderMaterial.clone(),
+			mesh = new THREE.Mesh(geometry, material);
 
 		var i, n, t;
-		var controlPoints = new Array(segments);
-		var animations = new Array(segments);
+		var controlPoints = [];
+		var animations = [];
 
-		for (i = 0, n = segments; i < n; ++i) {
+		for (i = 0, n = segments+1; i < n; ++i) {
 			t = i / (n-1);
+
 			controlPoints[i] = new THREE.Vector3(0.0, length * t, 0.0);
+
+			if (i === n-1) {
+				geometry.vertices.push(
+					new THREE.Vector3(0.0, i, 0.0)
+				)
+			}
+			else {
+				geometry.vertices.push(
+					new THREE.Vector3(-1.0, i, 0.0),
+					new THREE.Vector3(1.0, i, 0.0)
+				);
+			}
+
+			// test animation
 			animations[i] = ANIM(controlPoints[i])
 				.from({
 					x: 0
@@ -305,12 +339,29 @@ require([
 				})
 				.duration(700)
 				.delay(300 * t*t)
-				.using(ANIM.easing.bell5)
+				.using(ANIM.easing.bell5);
 		}
+
+		material.uniforms.uControlPoints.value = controlPoints;
+
+		for (i = 0, n = segments-1; i < n; ++i) {
+			geometry.faces.push(
+				new THREE.Face3(i*2, i*2+1, i*2+2),
+				new THREE.Face3(i*2+2, i*2+1, i*2+3)
+			);
+		}
+
+		geometry.faces.push(
+			new THREE.Face3(i*2, i*2+1, i*2+2)
+		);
+
+
+		scene.add(mesh);
 
 		// animation
 		var lineMesh = debugLines(scene, controlPoints, 0xffffff);
-			lineMesh.geometry.dynamic = true;
+		lineMesh.geometry.dynamic = true;
+		lineMesh.position.x = -200;
 
 		ANIM.group(animations)
 			.repeat(Infinity)
@@ -318,7 +369,6 @@ require([
 				lineMesh.geometry.verticesNeedUpdate = true;
 			})
 			.start();
-
 	}
 
 	function debugLines(parent, vertices, color) {
