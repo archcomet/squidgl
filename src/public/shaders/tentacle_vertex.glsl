@@ -1,16 +1,17 @@
 
-uniform vec3 uControlPoints[20];
+uniform vec3 uControlPoints[21];
 uniform float uWidth;
 
 void main()
 {
-
 	int i = int(position.y);
+	vec2 pos = uControlPoints[i].xy;
+	vec2 cp = uControlPoints[i+1].xy;
+	vec2 d0 = normalize(cp - pos) * (uWidth * (1.0-(position.y/19.0))) * position.x;
 
-	vec3 cp = uControlPoints[i];
+	d0 = d0.yx;
+	d0.y *= -1.0;
+	pos += d0;
 
-	float x = position.x * uWidth * 0.5 * (1.0-(position.y / 19.0)) + cp.x;
-	float y = cp.y;
-
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(x, y, 0.0, 1.0);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 0.0, 1.0);
 }

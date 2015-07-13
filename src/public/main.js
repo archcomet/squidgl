@@ -1,4 +1,9 @@
 
+// todo tentacle fragment AA/outline
+// todo encapsulate current experiments
+// todo basic IK for tentacle
+// todo basic steering
+
 require.config({
 	paths: {
 		'animate': 'libs/animate',
@@ -354,7 +359,6 @@ require([
 		geometry.faces.push(
 			new THREE.Face3(i*2, i*2+1, i*2+2)
 		);
-
 
 		scene.add(mesh);
 
