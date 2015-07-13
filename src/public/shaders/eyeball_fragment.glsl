@@ -7,13 +7,11 @@ uniform vec2 uLookAt;
 uniform float uTime;
 uniform float uDepth;
 
+varying float vBodyRadius;
+varying float vStrokeRadius;
 varying vec2 vWorldPosition;
 varying vec2 vFragCoord;
 
-#define PULSE_SPEED 0.1
-#define PULSE_SIZE 0.15
-#define SCLARA_RATIO 0.6
-#define IRIS_RATIO 0.38
 #define WHITE vec3(1.0, 1.0, 1.0)
 #define BLACK vec3(0.0, 0.0, 0.0)
 
@@ -29,12 +27,8 @@ void sdfCircle(inout vec4 color, vec3 mixColor, float d, float radius)
 
 void main()
 {
-    float t = sin((uTime / uRadius) * PULSE_SPEED);
-
     vec2 irisPos = uLookAt - vWorldPosition;
 
-    float bodyRadius = uRadius * (1.0 + (t*t*t*t*t*t*t*t*t*t) * PULSE_SIZE);
-    float strokeRadius = bodyRadius + uStrokeWidth;
     float sclaraRadius = uRadius * SCLARA_RATIO;
     float irisRadius = uRadius * IRIS_RATIO;
 
@@ -45,12 +39,11 @@ void main()
 
     vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
 
-    sdfCircle(color, uStroke, bodyDist, strokeRadius);
-    sdfCircle(color, uColor, bodyDist, bodyRadius);
+    sdfCircle(color, uStroke, bodyDist, vStrokeRadius);
+    sdfCircle(color, uColor, bodyDist, vBodyRadius);
     sdfCircle(color, WHITE, bodyDist, sclaraRadius);
     sdfCircle(color, BLACK, irisDist, irisRadius);
 
-//
     gl_FragColor = color;
 }
 

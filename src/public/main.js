@@ -20,8 +20,7 @@ require.config({
 require([
 	'THREE',
 	'animate',
-	'glsl!shaders/eyeball_vertex',
-	'glsl!shaders/eyeball_fragment',
+	'meshes/eyeballMesh',
 	'glsl!shaders/curve_vertex',
 	'glsl!shaders/curve_fragment',
 	'glsl!shaders/curvefill_vertex',
@@ -30,12 +29,12 @@ require([
 	'glsl!shaders/tentacle_fragment'
 
 ], function (
-	THREE, ANIM, eyeball_vertex, eyeball_fragment,
+	THREE, ANIM, EyeballMesh,
 	curve_vertex, curve_fragment, curvefill_vertex, curvefill_fragment,
 	tentacle_vertex, tentacle_fragment
 ) {
 
-	var eyeballShaderMaterial, curveShaderMaterial, curveFillShaderMaterial, tentacleShaderMaterial;
+	var curveShaderMaterial, curveFillShaderMaterial, tentacleShaderMaterial;
 	var renderer, scene, camera;
 
 	var WIDTH = window.innerWidth,
@@ -43,14 +42,14 @@ require([
 
 	var input;
 
-	var eyeballUniforms = [];
+	var eyeballs = [];
 
 	initScene();
 	initMouse();
 	initShaders();
-	//initEyeballs();
+	initEyeballs();
 	//initCurveGeometry();
-	initCurveGeometry2();
+	//initCurveGeometry2();
 
 	animate();
 
@@ -91,21 +90,6 @@ require([
 
 	function initShaders() {
 
-		eyeballShaderMaterial = new THREE.ShaderMaterial({
-			uniforms: {
-				uRadius: {type: 'f', value: 30.0},
-				uStrokeWidth: {type: 'f', value: 4.0},
-				uTime: {type: 'f', value: 0.0},
-				uDepth: {type: 'f', value: 1.0},
-				uColor: {type: 'c', value: new THREE.Color() },
-				uStroke: {type: 'c', value: new THREE.Color() },
-				uLookAt: {type: 'v2', value: new THREE.Vector2(0.0, 0.0)}
-			},
-			vertexShader: eyeball_vertex,
-			fragmentShader: eyeball_fragment,
-			transparent: true
-		});
-
 		curveShaderMaterial = new THREE.ShaderMaterial({
 			uniforms: {
 				uColor: {type:'c', value: new THREE.Color(0xffaa00)}
@@ -134,29 +118,6 @@ require([
 		})
 	}
 
-	function createEyeball(position, radius, strokeWidth, color) {
-
-		var geometrySize = (radius + strokeWidth)* 2.0 * 1.17;
-
-		var geometry = new THREE.PlaneBufferGeometry(geometrySize, geometrySize, 1.0, 1.0),
-			material = eyeballShaderMaterial.clone(),
-			mesh = new THREE.Mesh(geometry, material);
-
-		var uniforms = material.uniforms;
-
-		uniforms.uRadius.value = radius;
-		uniforms.uStrokeWidth.value = strokeWidth;
-		uniforms.uColor.value.copy(color);
-		uniforms.uStroke.value.copy(color);
-		uniforms.uStroke.value.offsetHSL(0.0, 0.0, 0.25);
-
-		mesh.position.copy(position);
-
-		scene.add(mesh);
-
-		eyeballUniforms.push(uniforms);
-	}
-
 	function randBetween (min, max) {
 
 		return min + Math.random() * (max - min);
@@ -165,7 +126,7 @@ require([
 
 	function initEyeballs() {
 
-		var i, radius, strokeWidth, pos = new THREE.Vector3(), color = new THREE.Color();
+		var eyeball, i, radius, strokeWidth, pos = new THREE.Vector3(), color = new THREE.Color();
 
 		for (i = 0; i < 200; ++i) {
 
@@ -184,7 +145,11 @@ require([
 				randBetween(0.3, 0.5)
 			);
 
-			createEyeball(pos, radius, strokeWidth, color);
+			eyeball = new EyeballMesh(radius, color, strokeWidth);
+			eyeball.position.copy(pos);
+			scene.add(eyeball);
+
+			eyeballs.push(eyeball);
 		}
 	}
 
@@ -409,14 +374,14 @@ require([
 			vector.unproject(camera);
 
 		var i = 0,
-			n = eyeballUniforms.length;
+			n = eyeballs.length;
 
-		var uniforms;
+		var eyeball, now = window.performance.now();
 
 		for (; i < n; ++i) {
-			uniforms = eyeballUniforms[i];
-			uniforms.uTime.value = window.performance.now();
-			uniforms.uLookAt.value.copy(vector);
+			eyeball = eyeballs[i];
+			eyeball.setTime(now);
+			eyeball.lookAt(vector);
 		}
 
 		render();
