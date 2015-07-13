@@ -5,9 +5,9 @@ define([
 ], function (THREE, eyeball_vertex, eyeball_fragment) {
 	'use strict';
 
-	var quadGeometry = new THREE.PlaneBufferGeometry(2.0, 2.0, 1.0, 1.0);
+	var sharedGeometry = new THREE.PlaneBufferGeometry(2.0, 2.0, 1.0, 1.0);
 
-	var eyeballMaterial = new THREE.ShaderMaterial({
+	var sharedMaterial = new THREE.ShaderMaterial({
 		uniforms: {
 			uRadius: {type: 'f', value: 30.0},
 			uColor: {type: 'c', value: new THREE.Color() },
@@ -29,7 +29,7 @@ define([
 
 	var EyeballMesh = function (radius, color, strokeWidth) {
 
-		var material = eyeballMaterial.clone(),
+		var material = sharedMaterial.clone(),
 			uniforms = material.uniforms;
 
 		uniforms.uRadius.value = radius;
@@ -38,11 +38,11 @@ define([
 		uniforms.uStroke.value.copy(color);
 		uniforms.uStroke.value.offsetHSL(0.0, 0.0, 0.25);
 
-		THREE.Mesh.call(this, quadGeometry, material);
-
+		THREE.Mesh.call(this, sharedGeometry, material);
 	};
 
 	EyeballMesh.prototype = Object.create(THREE.Mesh.prototype);
+	EyeballMesh.prototype.constructor = THREE.Mesh;
 
 	EyeballMesh.prototype.lookAt = function (target) {
 		this.material.uniforms.uLookAt.value.set(target.x, target.y);
