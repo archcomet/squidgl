@@ -1,12 +1,12 @@
 
-uniform vec3 uControlPoints[21];
+uniform vec2 uControlPoints[21];
 uniform float uWidth;
 
 void main()
 {
 	int i = int(position.y);
-	vec2 pos = uControlPoints[i].xy;
-	vec2 cp = uControlPoints[i+1].xy;
+	vec2 pos = uControlPoints[i];
+	vec2 cp = uControlPoints[i+1];
 	vec2 d0 = normalize(cp - pos) * (uWidth * (1.0-(position.y/19.0))) * position.x;
 
 	d0 = d0.yx;

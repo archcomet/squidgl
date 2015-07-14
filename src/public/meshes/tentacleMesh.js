@@ -11,8 +11,7 @@ define([
 		uniforms: {
 			uColor: {type:'c', value: new THREE.Color(0xffaa00)},
 			uWidth: {type:'f', value: 25.0 },
-			uControlPoints: { type:'v3v', value:[]},
-			uPointsSize: {type:'i', value: 20 }
+			uControlPoints: { type:'v2v', value:[]}
 		},
 		vertexShader: tentacle_vertex,
 		fragmentShader: tentacle_fragment
@@ -22,36 +21,37 @@ define([
 
 		var bufferGeometry = new THREE.BufferGeometry();
 
-		var i, length = 6 * (size-1) + 3,
-			indices = new Int32Array(length),
+		var i, offset,
+			length = 6 * (size-1) + 3,
+			indices = new Uint16Array(length),
 			vertices = new Float32Array(length);
 
 		for (i = 0; i < size - 1; ++i) {
+			offset = i * 6;
 
-			vertices[i*6]   = -1.0;
-			vertices[i*6+1] = i;
-			vertices[i*6+2] = 0.0;
+			vertices[offset] = -1.0;
+			vertices[offset+1] = i;
+			vertices[offset+2] = 0.0;
 
-			vertices[i*6+3] = 1.0;
-			vertices[i*6+4] = i;
-			vertices[i*6+5] = 0.0;
+			vertices[offset+3] = 1.0;
+			vertices[offset+4] = i;
+			vertices[offset+5] = 0.0;
 
-			indices[i*6] = i*2;
-			indices[i*6+1] = i*2+1;
-			indices[i*6+2] = i*2+2;
+			indices[offset] = i*2;
+			indices[offset+1] = i*2+1;
+			indices[offset+2] = i*2+2;
 
-			indices[i*6+3] = i*2+2;
-			indices[i*6+4] = i*2+1;
-			indices[i*6+5] = i*2+3;
+			if (i < size - 2) {
+				indices[offset + 3] = i * 2 + 2;
+				indices[offset + 4] = i * 2 + 1;
+				indices[offset + 5] = i * 2 + 3;
+			}
 		}
 
-		vertices[i*6]   = 0.0;
-		vertices[i*6+1] = i;
-		vertices[i*6+2] = 0.0;
-
-		indices[i*6] = i*2;
-		indices[i*6+1] = i*2+1;
-		indices[i*6+2] = i*2+2;
+		offset = i * 6;
+		vertices[offset] = 0.0;
+		vertices[offset+1] = i;
+		vertices[offset+2] = 0.0;
 
 		bufferGeometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 		bufferGeometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ));
@@ -67,12 +67,22 @@ define([
 		return bufferGeometry;
 	}
 
-	var TentacleMesh = function(width, length, size) {
+	var TentacleMesh = function(width, length, color) {
 
-		var bufferGeometry = getSharedGeometry(size);
+		var bufferGeometry = getSharedGeometry(20);
 		var material = shaderMaterial.clone();
+		var uniforms = material.uniforms;
 
-		// todo control point magic and setting other uniforms
+		var i, controlPoints = [];
+		for (i = 0; i < 20; ++i) {
+			controlPoints.push(new THREE.Vector2(0.0, length * (i / 19)));
+		}
+
+		controlPoints.push(new THREE.Vector2(0.0, length));
+
+		uniforms.uWidth.value = width;
+		uniforms.uColor.value.copy(color);
+		uniforms.uControlPoints.value = controlPoints;
 
 		THREE.Mesh.call(this, bufferGeometry, material);
 	};
