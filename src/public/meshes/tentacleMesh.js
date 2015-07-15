@@ -5,6 +5,10 @@ define([
 ], function (THREE, tentacle_vertex, tentacle_fragment) {
 	'use strict';
 
+	//todo temp
+	var FRICTION = 0.01;
+	var ENV = new THREE.Vector2(0.01, 0.05);
+
 	var sharedBuffers = {};
 
 	var shaderMaterial = new THREE.ShaderMaterial({
@@ -73,16 +77,28 @@ define([
 		var material = shaderMaterial.clone();
 		var uniforms = material.uniforms;
 
-		var i, controlPoints = [];
+		var i, controlPoints = [],
+			velocityPoints = [],
+			oldControlPoints = [];
+
 		for (i = 0; i < 20; ++i) {
-			controlPoints.push(new THREE.Vector2(0.0, length * (i / 19)));
+			controlPoints.push(new THREE.Vector2(0.0, -length * (i / 19)));
+			velocityPoints.push(new THREE.Vector2(0.0, 0.0));
+			oldControlPoints.push(new THREE.Vector2(0.0, 0.0));
 		}
 
 		controlPoints.push(new THREE.Vector2(0.0, length));
+		velocityPoints.push(new THREE.Vector2(0.0, 0.0));
+		oldControlPoints.push(new THREE.Vector2(0.0, 0.0));
 
 		uniforms.uWidth.value = width;
 		uniforms.uColor.value.copy(color);
 		uniforms.uControlPoints.value = controlPoints;
+
+		// todo typed array
+		this.segmentLength = length / 18;
+		this.oldControlPoints = oldControlPoints;
+		this.velocityPoints = velocityPoints;
 
 		THREE.Mesh.call(this, bufferGeometry, material);
 	};
@@ -91,6 +107,46 @@ define([
 	TentacleMesh.prototype.constructor = THREE.Mesh;
 
 	// todo IK for control points
+
+	TentacleMesh.prototype.update = function(x, y) {
+
+		var controlPoints = this.material.uniforms.uControlPoints.value,
+			velocityPoints = this.velocityPoints,
+			oldControlPoints = this.oldControlPoints,
+			segmentLength = this.segmentLength;
+
+
+		var delta = new THREE.Vector2(),
+			i, n = controlPoints.length;
+
+		var prev, curr, velocity, old;
+
+		prev = controlPoints[0];
+		prev.x = x;
+		prev.y = y;
+
+		for (i = 1; i < n; ++i) {
+
+			curr = controlPoints[i];
+			velocity = velocityPoints[i];
+			old = oldControlPoints[i];
+
+			delta.subVectors(prev, curr);
+			delta.normalize();
+			delta.multiplyScalar(segmentLength);
+
+			curr.subVectors(prev, delta);
+
+			velocity.subVectors(curr, old);
+			velocity.multiplyScalar(1.0 - FRICTION);
+			velocity.add(ENV);
+
+			old.copy(curr);
+
+			prev = curr;
+		}
+
+	};
 
 	return TentacleMesh;
 

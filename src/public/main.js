@@ -39,7 +39,7 @@ require([
 
 	initScene();
 	initMouse();
-	//initEyeballs();
+	initEyeballs();
 	initTentacles();
 
 
@@ -88,7 +88,7 @@ require([
 
 		var eyeball, i, radius, strokeWidth, pos = new THREE.Vector3(), color = new THREE.Color();
 
-		for (i = 0; i < 10; ++i) {
+		for (i = 0; i < 20; ++i) {
 
 			pos.x = Math.random() * 2 - 1;
 			pos.y = Math.random() * 2 - 1;
@@ -115,6 +115,8 @@ require([
 
 	function initTentacles() {
 		var tentacle = new TentacleMesh(30, 200, new THREE.Color(0xffaa00), 20);
+
+		tentacles.push(tentacle);
 		scene.add(tentacle);
 	}
 
@@ -140,12 +142,23 @@ require([
 		var i = 0,
 			n = eyeballs.length;
 
-		var eyeball, now = window.performance.now();
+		var eyeball, tentacle, now = window.performance.now();
 
 		for (; i < n; ++i) {
 			eyeball = eyeballs[i];
 			eyeball.setTime(now);
 			eyeball.lookAt(vector);
+		}
+
+
+		for (i = 0, n = tentacles.length; i < n; ++i) {
+			var x = Math.cos(now/1000) * 250;
+			var y = Math.sin(now/1000) * 250;
+
+			tentacle = tentacles[i];
+			tentacle.update(x, y);
+
+
 		}
 
 		render();
