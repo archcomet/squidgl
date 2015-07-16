@@ -152,11 +152,11 @@ require([
 
 
 		for (i = 0, n = tentacles.length; i < n; ++i) {
-			var x = Math.cos(now/1000) * 250;
-			var y = Math.sin(now/1000) * 250;
+			//var x = Math.cos(now/1000) * 250;
+			//var y = Math.sin(now/1000) * 250;
 
 			tentacle = tentacles[i];
-			tentacle.update(x, y);
+			tentacle.update(vector);
 
 
 		}

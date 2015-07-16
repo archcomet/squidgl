@@ -6,8 +6,8 @@ define([
 	'use strict';
 
 	//todo temp
-	var FRICTION = 0.01;
-	var ENV = new THREE.Vector2(0.01, 0.05);
+	var FRICTION = 0.35;
+	var ENV = new THREE.Vector2(0.01, -0.15);
 
 	var sharedBuffers = {};
 
@@ -21,7 +21,63 @@ define([
 		fragmentShader: tentacle_fragment
 	});
 
+
+	function setVector3(vertices, i, x, y, z) {
+		var offset = i*3;
+		vertices[offset] = x;
+		vertices[offset+1] = y;
+		vertices[offset+2] = z;
+	}
+
+	function createBufferGeometry2(size) {
+
+		var bufferGeometry = new THREE.BufferGeometry();
+
+		var i, offset,
+			vIdx = 0,
+			iIdx = 0,
+			xOf = 0.414,
+			vertices = new Float32Array(3 * (6 + 5 * (size-1))),
+			indices = new Uint16Array(3 * (4 + 6 * (size-1)));
+
+		setVector3(vertices,   vIdx, 0.0,  0.0, 0.0);
+		setVector3(vertices, ++vIdx, 0.0, -1.0, 0.0);
+		setVector3(vertices, ++vIdx, 0.0,  1.0, 0.0);
+		setVector3(vertices, ++vIdx, xOf, -1.0, 0.0);
+		setVector3(vertices, ++vIdx, xOf,  1.0, 0.0);
+		setVector3(vertices, ++vIdx, 0.0,  0.0, 1.0);
+
+		setVector3(indices,   iIdx, 0, 2, 1);
+		setVector3(indices, ++iIdx, 0, 5, 3);
+		setVector3(indices, ++iIdx, 0, 4, 3);
+		setVector3(indices, ++iIdx, 0, 2, 4);
+
+		for (i = 0; i < size; ++i) {
+
+			setVector3(vertices, ++vIdx, -xOf, -1.0, i+1);
+			setVector3(vertices, ++vIdx, -xOf,  1.0, i+1);
+			setVector3(vertices, ++vIdx,  xOf, -1.0, i+1);
+			setVector3(vertices, ++vIdx,  xOf,  1.0, i+1);
+			setVector3(vertices, ++vIdx,  0.0,  0.0, i+2);
+
+			offset = (i + 1) * 5;
+
+			setVector3(indices, ++iIdx, offset, offset + 1, offset - 2);
+			setVector3(indices, ++iIdx, offset, offset - 1, offset + 2);
+			setVector3(indices, ++iIdx, offset, offset + 3, offset + 1);
+			setVector3(indices, ++iIdx, offset, offset + 2, offset + 4);
+			setVector3(indices, ++iIdx, offset, offset + 5, offset + 3);
+			setVector3(indices, ++iIdx, offset, offset + 4, offset + 5);
+		}
+
+		bufferGeometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+		bufferGeometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ));
+
+		return bufferGeometry;
+	}
+
 	function createBufferGeometry(size) {
+
 
 		var bufferGeometry = new THREE.BufferGeometry();
 
@@ -108,13 +164,12 @@ define([
 
 	// todo IK for control points
 
-	TentacleMesh.prototype.update = function(x, y) {
+	TentacleMesh.prototype.update = function(input) {
 
 		var controlPoints = this.material.uniforms.uControlPoints.value,
 			velocityPoints = this.velocityPoints,
 			oldControlPoints = this.oldControlPoints,
 			segmentLength = this.segmentLength;
-
 
 		var delta = new THREE.Vector2(),
 			i, n = controlPoints.length;
@@ -122,14 +177,15 @@ define([
 		var prev, curr, velocity, old;
 
 		prev = controlPoints[0];
-		prev.x = x;
-		prev.y = y;
+		prev.copy(input);
 
 		for (i = 1; i < n; ++i) {
 
 			curr = controlPoints[i];
 			velocity = velocityPoints[i];
 			old = oldControlPoints[i];
+
+			curr.add(velocity);
 
 			delta.subVectors(prev, curr);
 			delta.normalize();
