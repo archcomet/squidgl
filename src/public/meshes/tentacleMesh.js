@@ -5,11 +5,11 @@ define([
 ], function (THREE, tentacle_vertex, tentacle_fragment) {
 	'use strict';
 
+	var SEGMENTS = 20;
+
 	//todo temp
 	var FRICTION = 0.35;
 	var ENV = new THREE.Vector2(0.01, -0.15);
-
-	var sharedBuffers = {};
 
 	var shaderMaterial = new THREE.ShaderMaterial({
 		uniforms: {
@@ -21,30 +21,28 @@ define([
 		fragmentShader: tentacle_fragment
 	});
 
+	var sharedBuffer = (function() {
 
-	function setVector3(vertices, i, x, y, z) {
-		var offset = i*3;
-		vertices[offset] = x;
-		vertices[offset+1] = y;
-		vertices[offset+2] = z;
-	}
-
-	function createBufferGeometry2(size) {
+		function setVector3(vertices, i, x, y, z) {
+			var offset = i*3;
+			vertices[offset] = x;
+			vertices[offset+1] = y;
+			vertices[offset+2] = z;
+		}
 
 		var bufferGeometry = new THREE.BufferGeometry();
 
 		var i, offset,
 			vIdx = 0,
 			iIdx = 0,
-			xOf = 0.414,
-			vertices = new Float32Array(3 * (6 + 5 * (size-1))),
-			indices = new Uint16Array(3 * (4 + 6 * (size-1)));
+			vertices = new Float32Array(3 * (6 + 5 * (SEGMENTS-1))),
+			indices = new Uint16Array(3 * (4 + 6 * (SEGMENTS-1)));
 
 		setVector3(vertices,   vIdx, 0.0,  0.0, 0.0);
 		setVector3(vertices, ++vIdx, 0.0, -1.0, 0.0);
 		setVector3(vertices, ++vIdx, 0.0,  1.0, 0.0);
-		setVector3(vertices, ++vIdx, xOf, -1.0, 0.0);
-		setVector3(vertices, ++vIdx, xOf,  1.0, 0.0);
+		setVector3(vertices, ++vIdx, 1.0, -1.0, 0.0);
+		setVector3(vertices, ++vIdx, 1.0,  1.0, 0.0);
 		setVector3(vertices, ++vIdx, 0.0,  0.0, 1.0);
 
 		setVector3(indices,   iIdx, 0, 2, 1);
@@ -52,12 +50,12 @@ define([
 		setVector3(indices, ++iIdx, 0, 4, 3);
 		setVector3(indices, ++iIdx, 0, 2, 4);
 
-		for (i = 0; i < size; ++i) {
+		for (i = 0; i < SEGMENTS; ++i) {
 
-			setVector3(vertices, ++vIdx, -xOf, -1.0, i+1);
-			setVector3(vertices, ++vIdx, -xOf,  1.0, i+1);
-			setVector3(vertices, ++vIdx,  xOf, -1.0, i+1);
-			setVector3(vertices, ++vIdx,  xOf,  1.0, i+1);
+			setVector3(vertices, ++vIdx, -1.0, -1.0, i+1);
+			setVector3(vertices, ++vIdx, -1.0,  1.0, i+1);
+			setVector3(vertices, ++vIdx,  1.0, -1.0, i+1);
+			setVector3(vertices, ++vIdx,  1.0,  1.0, i+1);
 			setVector3(vertices, ++vIdx,  0.0,  0.0, i+2);
 
 			offset = (i + 1) * 5;
@@ -74,62 +72,12 @@ define([
 		bufferGeometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ));
 
 		return bufferGeometry;
-	}
 
-	function createBufferGeometry(size) {
-
-
-		var bufferGeometry = new THREE.BufferGeometry();
-
-		var i, offset,
-			length = 6 * (size-1) + 3,
-			indices = new Uint16Array(length),
-			vertices = new Float32Array(length);
-
-		for (i = 0; i < size - 1; ++i) {
-			offset = i * 6;
-
-			vertices[offset] = -1.0;
-			vertices[offset+1] = i;
-			vertices[offset+2] = 0.0;
-
-			vertices[offset+3] = 1.0;
-			vertices[offset+4] = i;
-			vertices[offset+5] = 0.0;
-
-			indices[offset] = i*2;
-			indices[offset+1] = i*2+1;
-			indices[offset+2] = i*2+2;
-
-			if (i < size - 2) {
-				indices[offset + 3] = i * 2 + 2;
-				indices[offset + 4] = i * 2 + 1;
-				indices[offset + 5] = i * 2 + 3;
-			}
-		}
-
-		offset = i * 6;
-		vertices[offset] = 0.0;
-		vertices[offset+1] = i;
-		vertices[offset+2] = 0.0;
-
-		bufferGeometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-		bufferGeometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ));
-
-		return bufferGeometry;
-	}
-
-	function getSharedGeometry(size) {
-		var bufferGeometry = sharedBuffers[size];
-		if (!bufferGeometry) {
-			bufferGeometry = sharedBuffers[size] = createBufferGeometry(size);
-		}
-		return bufferGeometry;
-	}
+	}());
 
 	var TentacleMesh = function(width, length, color) {
 
-		var bufferGeometry = getSharedGeometry(20);
+		var bufferGeometry = sharedBuffer;
 		var material = shaderMaterial.clone();
 		var uniforms = material.uniforms;
 
@@ -137,13 +85,13 @@ define([
 			velocityPoints = [],
 			oldControlPoints = [];
 
-		for (i = 0; i < 20; ++i) {
-			controlPoints.push(new THREE.Vector2(0.0, -length * (i / 19)));
+		for (i = 0; i < SEGMENTS+1; ++i) {
+			controlPoints.push(new THREE.Vector2(0.0, -length * (i / SEGMENTS)));
 			velocityPoints.push(new THREE.Vector2(0.0, 0.0));
 			oldControlPoints.push(new THREE.Vector2(0.0, 0.0));
 		}
 
-		controlPoints.push(new THREE.Vector2(0.0, length));
+		controlPoints.push(new THREE.Vector2(0.0, -length));
 		velocityPoints.push(new THREE.Vector2(0.0, 0.0));
 		oldControlPoints.push(new THREE.Vector2(0.0, 0.0));
 
@@ -152,7 +100,7 @@ define([
 		uniforms.uControlPoints.value = controlPoints;
 
 		// todo typed array
-		this.segmentLength = length / 18;
+		this.segmentLength = length / SEGMENTS;
 		this.oldControlPoints = oldControlPoints;
 		this.velocityPoints = velocityPoints;
 

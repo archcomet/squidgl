@@ -4,14 +4,34 @@ uniform float uWidth;
 
 void main()
 {
-	int i = int(position.y);
-	vec2 curr = uControlPoints[i];
-	vec2 next = uControlPoints[i+1];
-	vec2 d0 = normalize(next - curr) * (uWidth * (1.0-(position.y/19.0))) * position.x;
+	// Get the CP index that is nearest the vertex
+	int idx = int(position.z);
 
-	d0 = d0.yx;
-	d0.y *= -1.0;
-	curr += d0;
+	// Get the direction of the next CP index
+ 	int next = int(position.x);
+	next += int(1.0 - abs(position.x));
 
-    gl_Position = projectionMatrix * viewMatrix * vec4(curr, 0.0, 1.0);
+	// Get the direction vector and length between the CPs
+	vec2 a = uControlPoints[idx];
+	vec2 b = uControlPoints[idx+next];
+	vec2 u = b - a;
+	float length = length(u);
+
+	// Get the heights at the two CPs
+	float aHeight = 0.5 * uWidth * (1.0 - float(idx) / 20.0);
+	float bHeight = 0.5 * uWidth * (1.0 - (float(idx+next)) / 20.0);
+
+	// Work out v
+	float pOffset = length * 0.15;
+	float pHeight = position.y * (bHeight - aHeight) * pOffset / length + aHeight;
+
+	vec2 norm = u / length;
+
+	vec2 pX = norm * pOffset;
+	vec2 pY = (norm * pHeight).yx;
+	pY.y *= -1.0;
+
+	vec2 pos = a + pX + pY;
+
+    gl_Position = projectionMatrix * viewMatrix * vec4(pos, 0.0, 1.0);
 }
