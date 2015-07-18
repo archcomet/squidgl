@@ -39,7 +39,7 @@ require([
 
 	initScene();
 	initMouse();
-	initEyeballs();
+//	initEyeballs();
 	initTentacles();
 
 

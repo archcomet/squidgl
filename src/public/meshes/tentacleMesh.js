@@ -18,7 +18,8 @@ define([
 			uControlPoints: { type:'v2v', value:[]}
 		},
 		vertexShader: tentacle_vertex,
-		fragmentShader: tentacle_fragment
+		fragmentShader: tentacle_fragment,
+		wireframe: true
 	});
 
 	var sharedBuffer = (function() {
@@ -41,32 +42,37 @@ define([
 		setVector3(vertices,   vIdx, 0.0,  0.0, 0.0);
 		setVector3(vertices, ++vIdx, 0.0, -1.0, 0.0);
 		setVector3(vertices, ++vIdx, 0.0,  1.0, 0.0);
-		setVector3(vertices, ++vIdx, 1.0, -1.0, 0.0);
-		setVector3(vertices, ++vIdx, 1.0,  1.0, 0.0);
 		setVector3(vertices, ++vIdx, 0.0,  0.0, 1.0);
 
-		setVector3(indices,   iIdx, 0, 2, 1);
-		setVector3(indices, ++iIdx, 0, 5, 3);
-		setVector3(indices, ++iIdx, 0, 4, 3);
-		setVector3(indices, ++iIdx, 0, 2, 4);
+		setVector3(indices,   iIdx, 0, 3, 1);
+		setVector3(indices, ++iIdx, 0, 2, 3);
 
-		for (i = 0; i < SEGMENTS; ++i) {
 
-			setVector3(vertices, ++vIdx, -1.0, -1.0, i+1);
-			setVector3(vertices, ++vIdx, -1.0,  1.0, i+1);
-			setVector3(vertices, ++vIdx,  1.0, -1.0, i+1);
-			setVector3(vertices, ++vIdx,  1.0,  1.0, i+1);
-			setVector3(vertices, ++vIdx,  0.0,  0.0, i+2);
+		//setVector3(vertices, ++vIdx, -1.0, -1.0, 1.0);
+		//setVector3(vertices, ++vIdx,  1.0, -1.0, 1.0);
+		//
+		//setVector3(indices, ++iIdx, 3, 4, 1);
+		//setVector3(indices, ++iIdx, 3, 2, 5);
 
-			offset = (i + 1) * 5;
+		//
 
-			setVector3(indices, ++iIdx, offset, offset + 1, offset - 2);
-			setVector3(indices, ++iIdx, offset, offset - 1, offset + 2);
-			setVector3(indices, ++iIdx, offset, offset + 3, offset + 1);
-			setVector3(indices, ++iIdx, offset, offset + 2, offset + 4);
-			setVector3(indices, ++iIdx, offset, offset + 5, offset + 3);
-			setVector3(indices, ++iIdx, offset, offset + 4, offset + 5);
-		}
+		//for (i = 0; i < SEGMENTS; ++i) {
+		//
+		//	setVector3(vertices, ++vIdx, -1.0, -1.0, i+1);
+		//	setVector3(vertices, ++vIdx, -1.0,  1.0, i+1);
+		//	setVector3(vertices, ++vIdx,  1.0, -1.0, i+1);
+		//	setVector3(vertices, ++vIdx,  1.0,  1.0, i+1);
+		//	setVector3(vertices, ++vIdx,  0.0,  0.0, i+2);
+		//
+		//	offset = (i + 1) * 5;
+		//
+		//	setVector3(indices, ++iIdx, offset, offset + 1, offset - 2);
+		//	//setVector3(indices, ++iIdx, offset, offset - 1, offset + 2);
+		//	//setVector3(indices, ++iIdx, offset, offset + 3, offset + 1);
+		//	//setVector3(indices, ++iIdx, offset, offset + 2, offset + 4);
+		//	//setVector3(indices, ++iIdx, offset, offset + 5, offset + 3);
+		//	//setVector3(indices, ++iIdx, offset, offset + 4, offset + 5);
+		//}
 
 		bufferGeometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 		bufferGeometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ));
@@ -103,6 +109,8 @@ define([
 		this.segmentLength = length / SEGMENTS;
 		this.oldControlPoints = oldControlPoints;
 		this.velocityPoints = velocityPoints;
+
+		console.log(width, this.segmentLength)
 
 		THREE.Mesh.call(this, bufferGeometry, material);
 	};
