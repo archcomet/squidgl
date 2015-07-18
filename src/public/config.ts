@@ -1,5 +1,5 @@
 
-/// <reference path='../../types/require.d.ts' />
+/// <reference path='../types.d.ts' />
 
 requirejs.config({
     paths: {
@@ -14,4 +14,9 @@ requirejs.config({
     }
 });
 
-require(['app']);
+require(['app'], function(App) {
+
+    var a = new App();
+    a.update();
+
+});
