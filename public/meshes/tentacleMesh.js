@@ -1,11 +1,11 @@
-/// <reference path='../../types.d.ts' />
-var __extends = this.__extends || function (d, b) {
+/// <reference path='../../typings/tsd.d.ts' />
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-define(["require", "exports", 'glsl!shaders/tentacle_vertex', 'glsl!shaders/tentacle_fragment'], function (require, exports, tentacleVertexShader, tentacleFragmentShader) {
+define(["require", "exports", 'three', 'shaders/tentacle_vertex.glsl!text', 'shaders/tentacle_fragment.glsl!text'], function (require, exports, THREE, tentacleVertexShader, tentacleFragmentShader) {
     var SEGMENTS = 20;
     var FRICTION = 0.35;
     var ENV = new THREE.Vector2(0.01, -0.15);
@@ -79,11 +79,11 @@ define(["require", "exports", 'glsl!shaders/tentacle_vertex', 'glsl!shaders/tent
         setVector3(vertices, ++vIdx, 0.0, 0.0, 1.0);
         setVector3(indices, iIdx, 0, 3, 1);
         setVector3(indices, ++iIdx, 0, 2, 3);
-        //setVector3(vertices, ++vIdx, -1.0, -1.0, 1.0);
-        //setVector3(vertices, ++vIdx,  1.0, -1.0, 1.0);
+        setVector3(vertices, ++vIdx, -1.0, -1.0, 1.0);
+        setVector3(vertices, ++vIdx, 1.0, -1.0, 1.0);
         //
-        //setVector3(indices, ++iIdx, 3, 4, 1);
-        //setVector3(indices, ++iIdx, 3, 2, 5);
+        setVector3(indices, ++iIdx, 3, 4, 1);
+        setVector3(indices, ++iIdx, 3, 2, 5);
         //
         //for (i = 0; i < SEGMENTS; ++i) {
         //

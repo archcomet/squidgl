@@ -1,9 +1,9 @@
 
-/// <reference path='../../types.d.ts' />
+/// <reference path='../types.d.ts' />
 
-import three = require('three');
-import eyeballVertexShader = require('glsl!shaders/eyeball_vertex');
-import eyeballFragmentShader = require('glsl!shaders/eyeball_fragment');
+import THREE = require('three');
+import eyeballVertexShader = require('shaders/eyeball_vertex.glsl!text');
+import eyeballFragmentShader = require('shaders/eyeball_fragment.glsl!text');
 
 var sharedGeometry = new THREE.PlaneBufferGeometry(2.0, 2.0, 1.0, 1.0);
 
@@ -27,7 +27,7 @@ var sharedMaterial = new THREE.ShaderMaterial({
 	transparent: true
 });
 
-class EyeballMesh extends three.Mesh {
+class EyeballMesh extends THREE.Mesh {
 
 	material: THREE.ShaderMaterial;
 

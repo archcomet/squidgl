@@ -1,9 +1,9 @@
 
-/// <reference path='../../types.d.ts' />
+/// <reference path='../../typings/tsd.d.ts' />
 
-import three = require('three');
-import tentacleVertexShader = require('glsl!shaders/tentacle_vertex');
-import tentacleFragmentShader = require('glsl!shaders/tentacle_fragment');
+import THREE = require('three');
+import tentacleVertexShader = require('shaders/tentacle_vertex.glsl!text');
+import tentacleFragmentShader = require('shaders/tentacle_fragment.glsl!text');
 
 var SEGMENTS = 20;
 var FRICTION = 0.35;
@@ -124,11 +124,11 @@ TentacleMesh.sharedBuffer = (function() {
 	setVector3(indices, ++iIdx, 0, 2, 3);
 
 
-	//setVector3(vertices, ++vIdx, -1.0, -1.0, 1.0);
-	//setVector3(vertices, ++vIdx,  1.0, -1.0, 1.0);
+	setVector3(vertices, ++vIdx, -1.0, -1.0, 1.0);
+	setVector3(vertices, ++vIdx,  1.0, -1.0, 1.0);
 	//
-	//setVector3(indices, ++iIdx, 3, 4, 1);
-	//setVector3(indices, ++iIdx, 3, 2, 5);
+	setVector3(indices, ++iIdx, 3, 4, 1);
+	setVector3(indices, ++iIdx, 3, 2, 5);
 
 	//
 

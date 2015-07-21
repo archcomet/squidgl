@@ -1,8 +1,7 @@
 
-/// <reference path='../types.d.ts' />
+/// <reference path='types.d.ts' />
 
-import animate = require('animate');
-import three = require('three');
+import THREE = require('three');
 import EyeballMesh = require('meshes/eyeballMesh');
 import TentacleMesh = require('meshes/tentacleMesh');
 
@@ -12,11 +11,11 @@ function randBetween (min: number, max: number): number {
 
 class App {
 
-    public camera: three.OrthographicCamera;
-    public scene: three.Scene;
-    public renderer: three.WebGLRenderer;
+    public camera: THREE.OrthographicCamera;
+    public scene: THREE.Scene;
+    public renderer: THREE.WebGLRenderer;
 
-    private input: three.Vector3;
+    private input: THREE.Vector3;
     private eyeballs: EyeballMesh[];
     private tentacles: TentacleMesh[];
     private container: Element;
@@ -29,6 +28,7 @@ class App {
         this.initScene();
         this.initMouse();
         this.initEyeballs();
+        //this.initTentacles();
     }
 
     initScene(): void {
@@ -108,6 +108,12 @@ class App {
             this.scene.add(eyeball);
             this.eyeballs.push(eyeball);
         }
+    }
+
+    initTentacles():void {
+        var tentacle = new TentacleMesh(30, 300, new THREE.Color(0xffaa00));
+        this.scene.add(tentacle);
+        this.tentacles.push(tentacle);
     }
 
     update(): void {

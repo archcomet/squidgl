@@ -1,11 +1,11 @@
-/// <reference path='../../types.d.ts' />
-var __extends = this.__extends || function (d, b) {
+/// <reference path='../types.d.ts' />
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-define(["require", "exports", 'three', 'glsl!shaders/eyeball_vertex', 'glsl!shaders/eyeball_fragment'], function (require, exports, three, eyeballVertexShader, eyeballFragmentShader) {
+define(["require", "exports", 'three', 'shaders/eyeball_vertex.glsl!text', 'shaders/eyeball_fragment.glsl!text'], function (require, exports, THREE, eyeballVertexShader, eyeballFragmentShader) {
     var sharedGeometry = new THREE.PlaneBufferGeometry(2.0, 2.0, 1.0, 1.0);
     var sharedMaterial = new THREE.ShaderMaterial({
         uniforms: {
@@ -45,7 +45,7 @@ define(["require", "exports", 'three', 'glsl!shaders/eyeball_vertex', 'glsl!shad
             this.material.uniforms.uTime.value = time;
         };
         return EyeballMesh;
-    })(three.Mesh);
+    })(THREE.Mesh);
     return EyeballMesh;
 });
 //# sourceMappingURL=eyeballMesh.js.map
