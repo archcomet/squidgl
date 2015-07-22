@@ -16,8 +16,8 @@ class App {
     public renderer: THREE.WebGLRenderer;
 
     private input: THREE.Vector3;
-    private eyeballs: EyeballMesh[];
-    private tentacles: TentacleMesh[];
+    private eyeballs: Array<EyeballMesh>;
+    private tentacles: Array<TentacleMesh>;
     private container: Element;
 
     constructor() {
@@ -25,10 +25,10 @@ class App {
         this.eyeballs = [];
         this.tentacles = [];
 
-        this.initScene();
+        this.initScene()
         this.initMouse();
         this.initEyeballs();
-        //this.initTentacles();
+        this.initTentacles();
     }
 
     initScene(): void {
@@ -86,7 +86,7 @@ class App {
         var pos = new THREE.Vector3(),
             color = new THREE.Color();
 
-        for (i = 0; i < 200; ++i) {
+        for (i = 0; i < 20; ++i) {
 
             pos.x = randBetween(-1, 1);
             pos.y = randBetween(-1, 1);
@@ -114,6 +114,10 @@ class App {
         var tentacle = new TentacleMesh(30, 300, new THREE.Color(0xffaa00));
         this.scene.add(tentacle);
         this.tentacles.push(tentacle);
+    }
+
+    start(): void {
+        this.update();
     }
 
     update(): void {

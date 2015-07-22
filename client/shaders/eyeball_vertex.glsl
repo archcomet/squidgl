@@ -1,3 +1,10 @@
+#ifndef PULSE_SPEED
+    #define PULSE_SPEED 0.1
+#endif
+
+#ifndef PULSE_SIZE
+   #define PULSE_SIZE 0.15
+#endif
 
 uniform float uRadius;
 uniform float uStrokeWidth;

@@ -3,6 +3,7 @@ System.config({
     transpiler: 'traceur',
     paths: {
         '*': '*.js',
+        'css': 'lib/css.js',
         'text': 'libs/text.js',
         'three': 'libs/three.min.js'
     },
@@ -11,4 +12,8 @@ System.config({
             exports: 'THREE'
         }
     }
+});
+
+System.import('app').then(function(App) {
+    (new App()).start();
 });
