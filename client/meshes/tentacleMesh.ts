@@ -7,19 +7,26 @@ import tentacleFragmentShader = require('shaders/tentacle_fragment.glsl!text');
 
 class TentacleMesh extends THREE.Mesh {
 
+	static angleStart = Math.PI/6;
+	static angleEnd = Math.PI/2;
+
 	static segments = 40.0;
-	static deflection = 0.15;
-	static friction = 0.30;
+	static deflection = 0.18;
+	static friction = 0.25;
+	static maxSegmentVelocity = 6;
+
 	static drift = new THREE.Vector2(0.01, -0.15);
+
 	static sharedGeometry: THREE.BufferGeometry;
 	static sharedMaterial: THREE.ShaderMaterial;
-
 	public geometry: THREE.BufferGeometry;
 	public material: THREE.ShaderMaterial;
 
 	private controlPoints: Array<THREE.Vector2>;
 	private velocityPoints: Array<THREE.Vector2>;
 	private oldControlPoints: Array<THREE.Vector2>;
+	private angleLimits: Array<THREE.Vector2>;
+
 	private segmentLength: number;
 
 	constructor(width: number, length: number, color: THREE.Color) {
@@ -31,11 +38,16 @@ class TentacleMesh extends THREE.Mesh {
 		this.controlPoints = [];
 		this.velocityPoints = [];
 		this.oldControlPoints = [];
+		this.angleLimits = [];
 
 		for (var i = 0; i < TentacleMesh.segments+1; ++i) {
 			this.controlPoints.push(new THREE.Vector2(0.0, -length * (i / TentacleMesh.segments)));
 			this.velocityPoints.push(new THREE.Vector2(0.0, 0.0));
 			this.oldControlPoints.push(new THREE.Vector2(0.0, 0.0));
+
+			var t = i / TentacleMesh.segments;
+			var angle = (TentacleMesh.angleEnd - TentacleMesh.angleStart) * t + TentacleMesh.angleStart;
+			this.angleLimits.push(new THREE.Vector2(Math.cos(angle), Math.sin(angle)));
 		}
 
 		this.controlPoints.push(new THREE.Vector2(0.0, -length));
@@ -45,6 +57,8 @@ class TentacleMesh extends THREE.Mesh {
 		var uniforms = this.material.uniforms;
 		uniforms.uWidth.value = width;
 		uniforms.uColor.value.copy(color);
+		uniforms.uStroke.value.copy(color);
+		uniforms.uStroke.value.offsetHSL(0.0, 0.0, 0.25);
 		uniforms.uControlPoints.value = this.controlPoints;
 
 		super(this.geometry, this.material);
@@ -52,35 +66,54 @@ class TentacleMesh extends THREE.Mesh {
 
 	public update (input: IVector): void {
 
-		var delta = new THREE.Vector2(),
-			i, n = this.controlPoints.length;
+		var i, n = this.controlPoints.length;
 
-		var prev, curr, velocity, old;
+		var prevPos = this.controlPoints[0],
+			oldPos = this.oldControlPoints[0],
+			limit:THREE.Vector2,
+			currPos:THREE.Vector2,
+			velocity:THREE.Vector2,
+			cross:number,
+			prevNorm = new THREE.Vector2(),
+			currNorm = new THREE.Vector2(),
+			currDir = new THREE.Vector2();
 
-		prev = this.controlPoints[0];
-		prev.copy(input);
+		oldPos.copy(prevPos);
+		prevPos.set(input.x, input.y);
 
-		for (i = 1; i < n; ++i) {
+		for (i = 1; i < n-1; ++i) {
 
-			curr = this.controlPoints[i];
+			currPos = this.controlPoints[i];
 			velocity = this.velocityPoints[i];
-			old = this.oldControlPoints[i];
+			oldPos = this.oldControlPoints[i];
+			limit = this.angleLimits[i];
+			currPos.add(velocity);
+			currNorm.subVectors(currPos, prevPos);
+			currNorm.normalize();
 
-			curr.add(velocity);
+			if (i >= 2 && currNorm.dot(prevNorm) < limit.x) {
+				cross = currNorm.x * prevNorm.y - currNorm.y * prevNorm.x;
+				cross /= -Math.abs(cross);
+				currNorm.x = prevNorm.x * limit.x - cross * prevNorm.y * limit.y;
+				currNorm.y = cross * prevNorm.x * limit.y + prevNorm.y * limit.x;
+			}
 
-			delta.subVectors(prev, curr);
-			delta.normalize();
-			delta.multiplyScalar(this.segmentLength);
+			currDir.copy(currNorm);
+			currDir.multiplyScalar(this.segmentLength);
+			currPos.addVectors(prevPos, currDir);
 
-			curr.subVectors(prev, delta);
-
-			velocity.subVectors(curr, old);
+			velocity.subVectors(currPos, oldPos);
 			velocity.multiplyScalar(1.0 - TentacleMesh.friction);
 			velocity.add(TentacleMesh.drift);
 
-			old.copy(curr);
+			if (velocity.length() > TentacleMesh.maxSegmentVelocity) {
+				velocity.normalize();
+				velocity.multiplyScalar(TentacleMesh.maxSegmentVelocity);
+			}
 
-			prev = curr;
+			oldPos.copy(currPos);
+			prevNorm.copy(currNorm);
+			prevPos = currPos;
 		}
 	}
 
@@ -90,6 +123,8 @@ class TentacleMesh extends THREE.Mesh {
 			TentacleMesh.sharedMaterial = new THREE.ShaderMaterial({
 				uniforms: {
 					uColor: {type:'c', value: new THREE.Color(0xffaa00)},
+					uStroke: {type:'c', value: new THREE.Color()},
+					uStrokeWidth: {type: 'f', value: 4.0},
 					uWidth: {type:'f', value: 25.0 },
 					uControlPoints: { type:'v2v', value:[]}
 				},
@@ -98,7 +133,8 @@ class TentacleMesh extends THREE.Mesh {
 					'DEFLECTION': TentacleMesh.deflection.toFixed(2)
 				},
 				vertexShader: tentacleVertexShader,
-				fragmentShader: tentacleFragmentShader
+				fragmentShader: tentacleFragmentShader,
+				transparent: true
 			});
 		}
 
@@ -109,16 +145,18 @@ class TentacleMesh extends THREE.Mesh {
 
 		if (!TentacleMesh.sharedGeometry) {
 
-			function setVector3(vertices, i, x, y, z) {
+			function setVector3(array, i, x, y, z) {
 				var offset = i * 3;
-				vertices[offset] = x;
-				vertices[offset + 1] = y;
-				vertices[offset + 2] = z;
+				array[offset] = x;
+				array[offset + 1] = y;
+				array[offset + 2] = z;
 			}
 
 			TentacleMesh.sharedGeometry = new THREE.BufferGeometry();
 
-			var i, vertexOffset, indexOffset,
+			var i:number,
+				vertexOffset:number,
+				indexOffset:number,
 				vIdx = 0,
 				iIdx = 0,
 				vertices = new Float32Array(3 * (6 + 5 * (TentacleMesh.segments - 1))),
@@ -128,17 +166,20 @@ class TentacleMesh extends THREE.Mesh {
 			setVector3(vertices, ++vIdx, 0.0, -1.0, 0.0);
 			setVector3(vertices, ++vIdx, 0.0, 1.0, 0.0);
 			setVector3(vertices, ++vIdx, 0.0, 0.0, 1.0);
+
 			setVector3(indices, iIdx, 0, 3, 1);
 			setVector3(indices, ++iIdx, 0, 2, 3);
 
 			for (i = 0; i < TentacleMesh.segments; ++i) {
 				vertexOffset = i + 1;
 				indexOffset = 3 + i * 5;
+
 				setVector3(vertices, ++vIdx, -1.0, -1.0, vertexOffset);
 				setVector3(vertices, ++vIdx, -1.0, 1.0, vertexOffset);
 				setVector3(vertices, ++vIdx, 1.0, -1.0, vertexOffset);
 				setVector3(vertices, ++vIdx, 1.0, 1.0, vertexOffset);
 				setVector3(vertices, ++vIdx, 0.0, 0.0, vertexOffset + 1.0);
+
 				setVector3(indices, ++iIdx, indexOffset, indexOffset + 1, indexOffset - 2);
 				setVector3(indices, ++iIdx, indexOffset, indexOffset - 1, indexOffset + 2);
 				setVector3(indices, ++iIdx, indexOffset, indexOffset + 3, indexOffset + 1);
