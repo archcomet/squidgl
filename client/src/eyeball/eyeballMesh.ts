@@ -1,8 +1,16 @@
 /// <reference path='../types.d.ts' />
+/// <amd-dependency path="./eyeballShaderVertex.glsl!text" />
+/// <amd-dependency path="./eyeballShaderFragment.glsl!text" />
 
 import THREE = require('three');
-import eyeballVertexShader = require('shaders/eyeball_vertex.glsl!text');
-import eyeballFragmentShader = require('shaders/eyeball_fragment.glsl!text');
+let eyeballVertexShader = require('./eyeballShaderVertex.glsl!text');
+let eyeballFragmentShader = require('./eyeballShaderFragment.glsl!text');
+
+interface IEyeballMeshOptions {
+    color: THREE.Color;
+    radius: number;
+    strokeWidth: number;
+}
 
 class EyeballMesh extends THREE.Mesh {
 
@@ -12,16 +20,16 @@ class EyeballMesh extends THREE.Mesh {
     public geometry:THREE.BufferGeometry;
     public material:THREE.ShaderMaterial;
 
-    constructor(radius:number, color:THREE.Color, strokeWidth:number) {
+    constructor(options: IEyeballMeshOptions) {
 
         this.geometry = EyeballMesh.getGeometry();
         this.material = EyeballMesh.getMaterial();
 
         var uniforms = this.material.uniforms;
-        uniforms.uRadius.value = radius;
-        uniforms.uStrokeWidth.value = strokeWidth;
-        uniforms.uColor.value.copy(color);
-        uniforms.uStroke.value.copy(color);
+        uniforms.uRadius.value = options.radius;
+        uniforms.uStrokeWidth.value = options.strokeWidth;
+        uniforms.uColor.value.copy(options.color);
+        uniforms.uStroke.value.copy(options.color);
         uniforms.uStroke.value.offsetHSL(0.0, 0.0, 0.25);
 
         super(this.geometry, this.material);

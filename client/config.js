@@ -14,6 +14,6 @@ System.config({
     }
 });
 
-System.import('app').then(function(App) {
+System.import('src/app').then(function(App) {
     (new App()).start();
 });

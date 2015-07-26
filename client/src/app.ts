@@ -1,5 +1,4 @@
 
-// todo squid class :)
 // todo game engine spike 1 player
     // todo basic swimming
     // todo basic chirping - sound, graphic, indicator
@@ -8,8 +7,7 @@
 /// <reference path='types.d.ts' />
 
 import THREE = require('three');
-import EyeballMesh = require('meshes/eyeballMesh');
-import TentacleMesh = require('meshes/tentacleMesh');
+import Squid = require('./squid/squid');
 
 function randBetween (min: number, max: number): number {
     return min + Math.random() * (max - min);
@@ -22,19 +20,16 @@ class App {
     public renderer: THREE.WebGLRenderer;
 
     private input: THREE.Vector3;
-    private eyeballs: Array<EyeballMesh>;
-    private tentacles: Array<TentacleMesh>;
     private container: Element;
+
+    private squids: Array<Squid>;
+    private lastTimestamp: number;
 
     constructor() {
 
-        this.eyeballs = [];
-        this.tentacles = [];
-
         this.initScene();
         this.initMouse();
-        this.initEyeballs();
-        this.initTentacles();
+        this.initSquids();
     }
 
     initScene(): void {
@@ -85,9 +80,11 @@ class App {
 
     }
 
-    initEyeballs() {
+    initSquids(): void {
 
-        var eyeball, i, radius, strokeWidth;
+        this.squids = [];
+
+        var squid, i;
 
         var pos = new THREE.Vector3(),
             color = new THREE.Color();
@@ -99,53 +96,50 @@ class App {
             pos.normalize();
             pos.multiplyScalar(Math.random() * 800 - 400);
 
-            radius = randBetween(10, 40);
-            strokeWidth = randBetween(3, 8);
-
             color.setHSL(
                 randBetween(0.0, 1.0),
                 randBetween(0.7, 1.0),
                 randBetween(0.3, 0.5)
             );
 
-            eyeball = new EyeballMesh(radius, color, strokeWidth);
-            eyeball.position.copy(pos);
+            squid = new Squid({
+                radius: randBetween(10, 25),
+                strokeWidth: randBetween(2, 5),
+                color: color
+            });
 
-            this.scene.add(eyeball);
-            this.eyeballs.push(eyeball);
+            squid.position.copy(pos);
+
+            this.scene.add(squid);
+            this.squids.push(squid);
         }
-    }
-
-    initTentacles():void {
-        var tentacle = new TentacleMesh(30, 300, new THREE.Color(0xffaa00));
-        this.scene.add(tentacle);
-        this.tentacles.push(tentacle);
     }
 
     start(): void {
-        this.update();
+        this.lastTimestamp = window.performance.now();
+        this.step(this.lastTimestamp);
     }
 
-    update(): void {
-
-        requestAnimationFrame(()=>{
-            this.update();
+    step(timestamp:number): void {
+        requestAnimationFrame((timestamp)=>{
+            this.step(timestamp);
         });
-
-        var vector = this.input.clone().unproject(this.camera);
-
-        var now = window.performance.now();
-
-        for (let eyeball of this.eyeballs) {
-            eyeball.setTime(now);
-            eyeball.lookAt(vector);
-        }
-
-        for (let tentacle of this.tentacles) {
-            tentacle.update(vector);
-        }
-
+        var dt = this.lastTimestamp - timestamp;
+        this.update(dt);
         this.render();
+        this.lastTimestamp = timestamp;
+    }
+
+    update(dt:number): void {
+        var vector = this.input.clone().unproject(this.camera);
+        vector.z = 0;
+
+        for (let squid of this.squids) {
+            squid.lookAt(vector);
+            squid.update(dt);
+        }
+
+       // this.squids[0].position.copy(vector);
     }
 
     render() {

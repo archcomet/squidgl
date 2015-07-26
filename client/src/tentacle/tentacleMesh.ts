@@ -1,70 +1,83 @@
-
-/// <reference path='../../typings/tsd.d.ts' />
+/// <reference path='../types.d.ts' />
+/// <amd-dependency path="./tentacleShaderVertex.glsl!text" />
+/// <amd-dependency path="./tentacleShaderFragment.glsl!text" />
 
 import THREE = require('three');
-import tentacleVertexShader = require('shaders/tentacle_vertex.glsl!text');
-import tentacleFragmentShader = require('shaders/tentacle_fragment.glsl!text');
+let tentacleVertexShader = require('./tentacleShaderVertex.glsl!text');
+let tentacleFragmentShader = require('./tentacleShaderFragment.glsl!text');
+
+interface ITentacleMeshOptions {
+	width: number,
+	length: number,
+	color: THREE.Color
+}
 
 class TentacleMesh extends THREE.Mesh {
 
-	static angleStart = Math.PI/6;
-	static angleEnd = Math.PI/2;
+	// Static
+	private static sharedGeometry: THREE.BufferGeometry;
+	private static sharedMaterial: THREE.ShaderMaterial;
+	private static segments = 40;
+	private static deflection = 0.18;
 
-	static segments = 40.0;
-	static deflection = 0.18;
-	static friction = 0.25;
-	static maxSegmentVelocity = 6;
-
-	static drift = new THREE.Vector2(0.01, -0.15);
-
-	static sharedGeometry: THREE.BufferGeometry;
-	static sharedMaterial: THREE.ShaderMaterial;
+	// Public
 	public geometry: THREE.BufferGeometry;
 	public material: THREE.ShaderMaterial;
 
+	// Private
+	private angleStart: number;
+	private angleEnd: number;
+	private friction: number;
+	private maxSegmentVelocity: number;
+	private drift: THREE.Vector2;
 	private controlPoints: Array<THREE.Vector2>;
 	private velocityPoints: Array<THREE.Vector2>;
 	private oldControlPoints: Array<THREE.Vector2>;
 	private angleLimits: Array<THREE.Vector2>;
-
 	private segmentLength: number;
 
-	constructor(width: number, length: number, color: THREE.Color) {
+	constructor(options: ITentacleMeshOptions) {
+
+		this.angleStart = Math.PI/4;
+		this.angleEnd = Math.PI/4;
+		this.friction = 0.25;
+		this.maxSegmentVelocity = 6;
+		this.drift = new THREE.Vector2(0.01, -0.15);
 
 		this.geometry = TentacleMesh.getBuffer();
 		this.material = TentacleMesh.getMaterial();
 
-		this.segmentLength = length / TentacleMesh.segments;
+		this.segmentLength = options.length / TentacleMesh.segments;
 		this.controlPoints = [];
 		this.velocityPoints = [];
 		this.oldControlPoints = [];
 		this.angleLimits = [];
 
 		for (var i = 0; i < TentacleMesh.segments+1; ++i) {
-			this.controlPoints.push(new THREE.Vector2(0.0, -length * (i / TentacleMesh.segments)));
+			this.controlPoints.push(new THREE.Vector2(0.0, -options.length * (i / TentacleMesh.segments)));
 			this.velocityPoints.push(new THREE.Vector2(0.0, 0.0));
 			this.oldControlPoints.push(new THREE.Vector2(0.0, 0.0));
 
 			var t = i / TentacleMesh.segments;
-			var angle = (TentacleMesh.angleEnd - TentacleMesh.angleStart) * t + TentacleMesh.angleStart;
+			var angle = (this.angleEnd - this.angleStart) * t + this.angleStart;
 			this.angleLimits.push(new THREE.Vector2(Math.cos(angle), Math.sin(angle)));
 		}
 
-		this.controlPoints.push(new THREE.Vector2(0.0, -length));
+		this.controlPoints.push(new THREE.Vector2(0.0, -options.length));
 		this.velocityPoints.push(new THREE.Vector2(0.0, 0.0));
 		this.oldControlPoints.push(new THREE.Vector2(0.0, 0.0));
 
 		var uniforms = this.material.uniforms;
-		uniforms.uWidth.value = width;
-		uniforms.uColor.value.copy(color);
-		uniforms.uStroke.value.copy(color);
+		uniforms.uWidth.value = options.width;
+		uniforms.uColor.value.copy(options.color);
+		uniforms.uStroke.value.copy(options.color);
 		uniforms.uStroke.value.offsetHSL(0.0, 0.0, 0.25);
 		uniforms.uControlPoints.value = this.controlPoints;
 
 		super(this.geometry, this.material);
 	}
 
-	public update (input: IVector): void {
+	public move (input: IVector): void {
 
 		var i, n = this.controlPoints.length;
 
@@ -103,12 +116,12 @@ class TentacleMesh extends THREE.Mesh {
 			currPos.addVectors(prevPos, currDir);
 
 			velocity.subVectors(currPos, oldPos);
-			velocity.multiplyScalar(1.0 - TentacleMesh.friction);
-			velocity.add(TentacleMesh.drift);
+			velocity.multiplyScalar(1.0 - this.friction);
+			velocity.add(this.drift);
 
-			if (velocity.length() > TentacleMesh.maxSegmentVelocity) {
+			if (velocity.length() > this.maxSegmentVelocity) {
 				velocity.normalize();
-				velocity.multiplyScalar(TentacleMesh.maxSegmentVelocity);
+				velocity.multiplyScalar(this.maxSegmentVelocity);
 			}
 
 			oldPos.copy(currPos);
