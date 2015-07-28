@@ -27,7 +27,7 @@ class Squid extends THREE.Object3D {
 
         var tentacleRadius = options.radius + options.strokeWidth;
 
-        for (let i = 0; i < 6; ++i) {
+        for (let i = 0; i < 8; ++i) {
             let tentacle = new TentacleMesh({
                 width: tentacleRadius * 0.8,
                 length: tentacleRadius * 4,
@@ -59,12 +59,13 @@ class Squid extends THREE.Object3D {
 
     private moveTentacles() {
 
-        var t = Math.sin((this.time / this.radius) * 0.1) * 0.5 + 0.5;
-        var radius = 0.2 * this.radius + 0.7 * (this.radius * t * t * t * t * t);
+        var t = Math.sin((this.time / this.radius) * 0.04) * 0.5 + 0.5;
+        var radius = 0.6 * this.radius + 1.2 * (this.radius * t * t * t * t * t * t * t * t * t * t );
 
         var tentacleLeft, tentacleRight,
             tentacleCount = this.tentacles.length,
-            vector = new THREE.Vector3(0.0, radius, 0.0);
+            vector = new THREE.Vector3(0.0, radius, 0.0),
+            pos = new THREE.Vector3();
 
         var x, y;
 
@@ -80,19 +81,22 @@ class Squid extends THREE.Object3D {
         vector.x = x;
         vector.y = y;
 
+        pos.copy(this.position);
+        pos.y -= this.radius * 0.5;
+
         for (let i = 0; i < tentacleCount / 2; ++i) {
 
             tentacleLeft = this.tentacles[i * 2];
             tentacleRight = this.tentacles[i * 2 + 1];
 
-            tentacleLeft.move({
-                x: this.position.x + vector.x,
-                y: this.position.y + vector.y
+            tentacleLeft.move(pos, {
+                x: pos.x + vector.x,
+                y: pos.y + vector.y
             });
 
-            tentacleRight.move({
-                x: this.position.x - vector.x,
-                y: this.position.y + vector.y
+            tentacleRight.move(pos, {
+                x: pos.x - vector.x,
+                y: pos.y + vector.y
             });
 
             x = c * vector.x - s * vector.y;

@@ -1,11 +1,15 @@
+System.defaultJSExtensions = true;
 
 System.config({
     transpiler: 'traceur',
+    format: 'cjs',
+    defaultJSExtensions: true,
     paths: {
-        '*': '*.js',
-        'css': 'lib/css.js',
-        'text': 'libs/text.js',
-        'three': 'libs/three.min.js'
+        'common/*': '../common/*.js'
+    },
+    map: {
+        'text': 'libs/text',
+        'three': 'libs/three.min'
     },
     shim: {
         'three': {

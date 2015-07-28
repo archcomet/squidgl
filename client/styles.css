@@ -4,7 +4,7 @@ body {
     font-size:13px;
     text-align:center;
     font-weight: bold;
-    background-color: #000000;
     margin: 0;
     overflow: hidden;
+    background: radial-gradient(ellipse at center,  #022D52 0%,#122335 40%,#000d19 100%);
 }

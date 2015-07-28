@@ -22,6 +22,21 @@
     },
     "rx/rx-lite.d.ts": {
       "commit": "7e93eceeffe51f908a4d986aa55561053cc22479"
+    },
+    "express/express.d.ts": {
+      "commit": "957f67316813592e870ba5c82e0f1e780826fefc"
+    },
+    "node/node.d.ts": {
+      "commit": "957f67316813592e870ba5c82e0f1e780826fefc"
+    },
+    "serve-static/serve-static.d.ts": {
+      "commit": "957f67316813592e870ba5c82e0f1e780826fefc"
+    },
+    "mime/mime.d.ts": {
+      "commit": "957f67316813592e870ba5c82e0f1e780826fefc"
+    },
+    "socket.io/socket.io.d.ts": {
+      "commit": "957f67316813592e870ba5c82e0f1e780826fefc"
     }
   }
 }

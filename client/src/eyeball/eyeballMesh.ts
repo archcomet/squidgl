@@ -1,6 +1,4 @@
 /// <reference path='../types.d.ts' />
-/// <amd-dependency path="./eyeballShaderVertex.glsl!text" />
-/// <amd-dependency path="./eyeballShaderFragment.glsl!text" />
 
 import THREE = require('three');
 let eyeballVertexShader = require('./eyeballShaderVertex.glsl!text');

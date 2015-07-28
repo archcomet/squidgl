@@ -7,6 +7,7 @@
 /// <reference path='types.d.ts' />
 
 import THREE = require('three');
+import Game = require('common/game');
 import Squid = require('./squid/squid');
 
 function randBetween (min: number, max: number): number {
@@ -46,8 +47,8 @@ class App {
 
         this.scene = new THREE.Scene();
 
-        this.renderer =  new THREE.WebGLRenderer();
-        this.renderer.setClearColor(0x022D52);
+        this.renderer =  new THREE.WebGLRenderer({ alpha: true });
+        this.renderer.setClearColor( 0xffffff, 0);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -89,12 +90,12 @@ class App {
         var pos = new THREE.Vector3(),
             color = new THREE.Color();
 
-        for (i = 0; i < 20; ++i) {
+        for (i = 0; i < 15; ++i) {
 
             pos.x = randBetween(-1, 1);
             pos.y = randBetween(-1, 1);
             pos.normalize();
-            pos.multiplyScalar(Math.random() * 800 - 400);
+            pos.multiplyScalar(Math.random() * 600 - 300);
 
             color.setHSL(
                 randBetween(0.0, 1.0),

@@ -1,6 +1,4 @@
 /// <reference path='../types.d.ts' />
-/// <amd-dependency path="./tentacleShaderVertex.glsl!text" />
-/// <amd-dependency path="./tentacleShaderFragment.glsl!text" />
 
 import THREE = require('three');
 let tentacleVertexShader = require('./tentacleShaderVertex.glsl!text');
@@ -39,10 +37,10 @@ class TentacleMesh extends THREE.Mesh {
 	constructor(options: ITentacleMeshOptions) {
 
 		this.angleStart = Math.PI/4;
-		this.angleEnd = Math.PI/4;
+		this.angleEnd = Math.PI/8;
 		this.friction = 0.25;
 		this.maxSegmentVelocity = 6;
-		this.drift = new THREE.Vector2(0.01, -0.15);
+		this.drift = new THREE.Vector2(0.05, -0.15);
 
 		this.geometry = TentacleMesh.getBuffer();
 		this.material = TentacleMesh.getMaterial();
@@ -77,12 +75,13 @@ class TentacleMesh extends THREE.Mesh {
 		super(this.geometry, this.material);
 	}
 
-	public move (input: IVector): void {
+	public move (root: IVector, next?: IVector): void {
 
-		var i, n = this.controlPoints.length;
+		var i = 0,
+			n = this.controlPoints.length;
 
-		var prevPos = this.controlPoints[0],
-			oldPos = this.oldControlPoints[0],
+		var prevPos = this.controlPoints[i],
+			oldPos = this.oldControlPoints[i],
 			limit:THREE.Vector2,
 			currPos:THREE.Vector2,
 			velocity:THREE.Vector2,
@@ -92,14 +91,27 @@ class TentacleMesh extends THREE.Mesh {
 			currDir = new THREE.Vector2();
 
 		oldPos.copy(prevPos);
-		prevPos.set(input.x, input.y);
+		prevPos.set(root.x, root.y);
 
-		for (i = 1; i < n-1; ++i) {
+		if (next) {
+			++i;
+			currPos = this.controlPoints[i];
+			oldPos = this.oldControlPoints[i];
+
+			currPos.set(next.x, next.y);
+			prevNorm.subVectors(currPos, prevPos);
+			prevNorm.normalize();
+			oldPos.copy(currPos);
+			prevPos = currPos;
+		}
+
+		for (++i; i < n-1; ++i) {
 
 			currPos = this.controlPoints[i];
 			velocity = this.velocityPoints[i];
 			oldPos = this.oldControlPoints[i];
 			limit = this.angleLimits[i];
+
 			currPos.add(velocity);
 			currNorm.subVectors(currPos, prevPos);
 			currNorm.normalize();

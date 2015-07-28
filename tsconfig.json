@@ -1,8 +1,9 @@
 {
   "version": "1.5.0",
   "compilerOptions": {
+    "sourceMap": true,
     "target": "es5",
-    "module": "amd",
+    "module": "commonjs",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
   }
