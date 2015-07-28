@@ -37,6 +37,12 @@
     },
     "socket.io/socket.io.d.ts": {
       "commit": "957f67316813592e870ba5c82e0f1e780826fefc"
+    },
+    "compression/compression.d.ts": {
+      "commit": "320f9fe96e134b82ca417b27d0948d1f0032d80d"
+    },
+    "body-parser/body-parser.d.ts": {
+      "commit": "ac3bfaece68e56d4a84b6612027260afc4669f44"
     }
   }
 }

@@ -1,0 +1,1 @@
+(c) Copyright 2015 Michael Good, all rights reserved.

@@ -14,6 +14,8 @@ function randBetween (min: number, max: number): number {
     return min + Math.random() * (max - min);
 }
 
+console.log(Game);
+
 class App {
 
     public camera: THREE.OrthographicCamera;

@@ -19,7 +19,6 @@ class TentacleMesh extends THREE.Mesh {
 	private static deflection = 0.18;
 
 	// Public
-	public geometry: THREE.BufferGeometry;
 	public material: THREE.ShaderMaterial;
 
 	// Private
@@ -42,9 +41,6 @@ class TentacleMesh extends THREE.Mesh {
 		this.maxSegmentVelocity = 6;
 		this.drift = new THREE.Vector2(0.05, -0.15);
 
-		this.geometry = TentacleMesh.getBuffer();
-		this.material = TentacleMesh.getMaterial();
-
 		this.segmentLength = options.length / TentacleMesh.segments;
 		this.controlPoints = [];
 		this.velocityPoints = [];
@@ -65,14 +61,17 @@ class TentacleMesh extends THREE.Mesh {
 		this.velocityPoints.push(new THREE.Vector2(0.0, 0.0));
 		this.oldControlPoints.push(new THREE.Vector2(0.0, 0.0));
 
-		var uniforms = this.material.uniforms;
+		var geometry = TentacleMesh.getBuffer();
+		var material = TentacleMesh.getMaterial();
+
+		var uniforms = material.uniforms;
 		uniforms.uWidth.value = options.width;
 		uniforms.uColor.value.copy(options.color);
 		uniforms.uStroke.value.copy(options.color);
 		uniforms.uStroke.value.offsetHSL(0.0, 0.0, 0.25);
 		uniforms.uControlPoints.value = this.controlPoints;
 
-		super(this.geometry, this.material);
+		super(geometry, material);
 	}
 
 	public move (root: IVector, next?: IVector): void {

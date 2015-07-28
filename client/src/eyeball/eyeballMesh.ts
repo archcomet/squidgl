@@ -15,22 +15,21 @@ class EyeballMesh extends THREE.Mesh {
     private static sharedGeometry:THREE.PlaneBufferGeometry;
     private static sharedMaterial:THREE.ShaderMaterial;
 
-    public geometry:THREE.BufferGeometry;
     public material:THREE.ShaderMaterial;
 
     constructor(options: IEyeballMeshOptions) {
 
-        this.geometry = EyeballMesh.getGeometry();
-        this.material = EyeballMesh.getMaterial();
+        var geometry = EyeballMesh.getGeometry();
+        var material = EyeballMesh.getMaterial();
 
-        var uniforms = this.material.uniforms;
+        var uniforms = material.uniforms;
         uniforms.uRadius.value = options.radius;
         uniforms.uStrokeWidth.value = options.strokeWidth;
         uniforms.uColor.value.copy(options.color);
         uniforms.uStroke.value.copy(options.color);
         uniforms.uStroke.value.offsetHSL(0.0, 0.0, 0.25);
 
-        super(this.geometry, this.material);
+        super(geometry, material);
     }
 
     public lookAt(target:IVector):void {

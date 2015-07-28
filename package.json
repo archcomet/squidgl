@@ -1,5 +1,15 @@
 {
+  "repository": "https://github.com/archcomet/squidgl.git",
+  "license": "LicenseRef-LICENSE",
+  "scripts": {
+    "preinstall": "tsd install",
+    "install": "tsc -p .",
+    "prestart": "npm install",
+    "start": "node server/server.js"
+  },
   "dependencies": {
+    "body-parser": "^1.13.2",
+    "compression": "^1.5.1",
     "express": "^4.13.1",
     "socket.io": "^1.3.6"
   }

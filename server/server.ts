@@ -1,11 +1,16 @@
 
 /// <reference path='./types.d.ts' />
 
-import express = require('express');
-import socket = require('socket.io');
+import app = require('./app');
+import io = require('./io');
 import Game = require('../common/game');
 
-var game = new Game();
-var state = game.update(10);
+var PORT = process.env.PORT || 3000;
+var SOCKET = process.env.SOCKET || 3001;
 
-console.log('Hello game state: ' + state.time);
+app.listen(PORT, () => {
+    console.log('Express server listening on port:%s', PORT);
+});
+
+io.serveClient(false);
+io.attach(SOCKET);
