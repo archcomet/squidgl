@@ -1,20 +1,12 @@
 
-// todo game engine spike 1 player
-    // todo basic swimming
-    // todo basic chirping - sound, graphic, indicator
-// todo server / client 2 player
-
 /// <reference path='types.d.ts' />
 
 import THREE = require('three');
-import Game = require('common/game');
 import Squid = require('./squid/squid');
 
 function randBetween (min: number, max: number): number {
     return min + Math.random() * (max - min);
 }
-
-console.log(Game);
 
 class App {
 

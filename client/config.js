@@ -1,4 +1,3 @@
-System.defaultJSExtensions = true;
 
 System.config({
     transpiler: 'traceur',
