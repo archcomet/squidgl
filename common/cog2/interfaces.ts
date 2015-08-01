@@ -1,5 +1,6 @@
 
 
+
 /**
  * Interface for Actor
  */
@@ -150,3 +151,57 @@ export interface IGame extends IActor {
 export interface IGameClass {
     new (): IGame;
 }
+
+// decorator
+export function systems() {
+    return () => {
+        
+    }
+}
+
+export function renderers() {
+    return () => {
+
+    }
+}
+
+export function defaults() {
+    return () => {
+
+    }
+}
+
+/**
+ *
+ */
+
+export interface IGameClient {
+    gameEngine: IGame;
+}
+
+export interface IGameClinentClass {
+    new (): IGameClient;
+}
+
+// todo move to impl
+export function bootstrapClient(game: IGameClass): IGameClient {
+    return null;
+}
+
+/**
+ *
+ */
+
+export interface IGameServer {
+    gameEngine: IGame;
+}
+
+export interface IGameServerClass {
+    new (): IGameServer;
+}
+
+// todo move to impl
+export function bookstrapServer(game: IGameClass): IGameServer {
+    return null;
+}
+
