@@ -2,28 +2,35 @@
 
 /// <reference path='./types.d.ts' />
 
+import { GameMode, GameState, Entity, Component, Mesh, Game, Renderer, System, defaults, components, meshes, renderers, systems } from './cog2/cog2';
 
-@SquidMesh([
+class SquidMesh extends Mesh {}
+class Box2DComponent extends Component {}
+class SteeringComponent extends Component {}
 
+@meshes([
+    SquidMesh
 ])
 
-@Box2DBodyComponent({
-    mass: 2,
-    friction: 0.1
-});
+@components([
+    Box2DComponent,
+    SteeringComponent
+])
 
-class Squid extends IEntity {
+class Squid extends Entity {}
 
-}
 
-@defaults({
-    gameMode: SquidGameMode,
-    gameState: SquidGameState,
-    playerController: SquidPlayerController,
-    configs: [
-        squidGameDefaultConfig
-    ]
-})
+
+
+
+
+class SquidGameMode extends GameMode {}
+class SquidGameState extends GameState {}
+
+class ThreeRenderer extends Renderer {}
+class Box2DPhysicsSystem extends System {}
+class SteeringSystem extends System {}
+
 
 @renderers([
     ThreeRenderer
@@ -34,13 +41,13 @@ class Squid extends IEntity {
     Box2DPhysicsSystem
 ])
 
-class SquidGame extends IGame {
-
+class SquidGame extends Game {
+    defaultGameModeClass = SquidGameMode;
+    defaultGameStateClass = SquidGameState;
 }
 
 
 export = SquidGame;
-
 
 // client-> join
 // server-> connect (send client data)

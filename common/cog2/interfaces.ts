@@ -1,13 +1,15 @@
 
-
+export interface IVector3 {
+    x: number;
+    y: number;
+    z: number;
+}
 
 /**
  * Interface for Actor
  */
 
-export interface IActor {
-
-    active: boolean;
+export interface IUpdatable {
 
     onInit?: (gameMode:IGameMode) => void;
 
@@ -25,11 +27,13 @@ export interface IActor {
  * Interface for Entity
  */
 
-export interface IEntity extends IActor {
+export interface IEntity extends IUpdatable {
+
+    active: boolean;
+
+    position: IVector3;
 
     controller: IController;
-
-    components: Array<IComponent>;
 
     getComponent: (ComponentClass:IComponentClass) => IComponent;
 
@@ -48,11 +52,23 @@ export interface IEntityClass {
 }
 
 /**
+ * IMesh
+ */
+
+export interface IMesh {
+
+}
+
+export interface IMeshClass {
+    new (): IMesh;
+}
+
+
+/**
  * Interface for Component
  */
 
 export interface IComponent {
-    //todo
 }
 
 export interface IComponentClass {
@@ -63,7 +79,7 @@ export interface IComponentClass {
  * Interface for System
  */
 
-export interface ISystem extends IActor {
+export interface ISystem extends IUpdatable {
 
     onInitSystems?: (gameMode:IGameMode) => void;
 
@@ -75,10 +91,22 @@ export interface ISystemClass {
 }
 
 /**
+ * Renderer
+ */
+
+export interface IRenderer extends IUpdatable {
+    onRender: () => void;
+}
+
+export interface IRendererClass {
+    new (): IRenderer;
+}
+
+/**
  * Interface for Controller
  */
 
-export interface IController extends IActor {
+export interface IController extends IUpdatable {
 
     entity: IEntity;
 
@@ -93,7 +121,7 @@ export interface IControllerClass {
  * Interface for GameMode
  */
 
-export interface IGameMode extends IActor {
+export interface IGameMode extends IUpdatable {
 
     state: IGameState;
 
@@ -130,7 +158,7 @@ export interface IGameState {
 
 }
 
-export interface IGameModeState {
+export interface IGameStateClass {
     new (): IGameState;
 }
 
@@ -138,9 +166,13 @@ export interface IGameModeState {
  * Interface for Game
  */
 
-export interface IGame extends IActor {
+export interface IGame extends IUpdatable {
 
-    loadState: (json: Object, GameStateClass?: IGameModeState) => void;
+    defaultGameModeClass: IGameModeClass;
+
+    defaultGameStateClass: IGameStateClass;
+
+    loadState: (json: Object, GameStateClass?: IGameStateClass) => void;
 
     saveState: () => Object;
 
@@ -150,25 +182,6 @@ export interface IGame extends IActor {
 
 export interface IGameClass {
     new (): IGame;
-}
-
-// decorator
-export function systems() {
-    return () => {
-        
-    }
-}
-
-export function renderers() {
-    return () => {
-
-    }
-}
-
-export function defaults() {
-    return () => {
-
-    }
 }
 
 /**
@@ -205,3 +218,37 @@ export function bookstrapServer(game: IGameClass): IGameServer {
     return null;
 }
 
+
+
+
+// decorators
+
+export function components (arr:Array<IComponentClass>) {
+    return () => {
+
+    }
+}
+
+export function meshes (arr:Array<IMeshClass>) {
+    return () => {
+
+    }
+}
+
+export function systems(arr:Array<ISystemClass>) {
+    return () => {
+
+    }
+}
+
+export function renderers(arr:Array<IRendererClass>) {
+    return () => {
+
+    }
+}
+
+export function defaults(obj:Object) {
+    return () => {
+
+    }
+}
