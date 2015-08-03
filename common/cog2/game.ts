@@ -6,7 +6,7 @@ import {GameState} from './gameState';
 export class Game implements IGame {
 
     public defaultGameModeClass: IGameModeClass = GameMode;
-    public defaultGameStatelass: IGameStateClass = GameState;
+    public defaultGameStateClass: IGameStateClass = GameState;
 
     private _state: IGameStateClass;
 

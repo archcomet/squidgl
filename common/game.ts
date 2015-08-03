@@ -21,9 +21,6 @@ class Squid extends Entity {}
 
 
 
-
-
-
 class SquidGameMode extends GameMode {}
 class SquidGameState extends GameState {}
 

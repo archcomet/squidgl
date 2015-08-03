@@ -72,6 +72,7 @@ export interface IComponent {
 }
 
 export interface IComponentClass {
+    id: number;
     new (): IComponent;
 }
 
@@ -107,10 +108,7 @@ export interface IRendererClass {
  */
 
 export interface IController extends IUpdatable {
-
     entity: IEntity;
-
-    //todo
 }
 
 export interface IControllerClass {
@@ -196,10 +194,6 @@ export interface IGameClinentClass {
     new (): IGameClient;
 }
 
-// todo move to impl
-export function bootstrapClient(game: IGameClass): IGameClient {
-    return null;
-}
 
 /**
  *
@@ -214,35 +208,22 @@ export interface IGameServerClass {
 }
 
 // todo move to impl
+export function bootstrapClient(game: IGameClass): IGameClient {
+    return null;
+}
+
 export function bookstrapServer(game: IGameClass): IGameServer {
     return null;
 }
 
-
-
-
-// decorators
-
-export function components (arr:Array<IComponentClass>) {
-    return () => {
-
-    }
-}
-
-export function meshes (arr:Array<IMeshClass>) {
-    return () => {
-
-    }
-}
-
 export function systems(arr:Array<ISystemClass>) {
-    return () => {
+    return (target: IGameClass) => {
 
     }
 }
 
 export function renderers(arr:Array<IRendererClass>) {
-    return () => {
+    return (target: IGameClass) => {
 
     }
 }

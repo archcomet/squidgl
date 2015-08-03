@@ -1,6 +1,14 @@
 
-
-import {IEntity, IController, IComponent, IComponentClass, IVector3} from './interfaces';
+import {
+    IEntity,
+    IEntityClass,
+    IComponent,
+    IComponentClass,
+    IController,
+    IMesh,
+    IMeshClass,
+    IVector3
+} from './interfaces';
 
 
 export class Entity implements IEntity {
@@ -32,4 +40,18 @@ export class Entity implements IEntity {
         return false;
     }
 
+}
+
+
+export function components (arr:Array<IComponentClass>) {
+    return (target: IEntityClass) => {
+
+        console.log(target);
+    }
+}
+
+export function meshes (arr:Array<IMeshClass>) {
+    return (target: IEntityClass) => {
+
+    }
 }
