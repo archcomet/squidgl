@@ -23,6 +23,10 @@ export interface IUpdatable {
 
 }
 
+export interface IUpdatableClass {
+    new (config:Object): IUpdatable;
+}
+
 /**
  * Interface for Entity
  */
@@ -51,18 +55,6 @@ export interface IEntityClass {
     new (): IEntity;
 }
 
-/**
- * IMesh
- */
-
-export interface IMesh {
-
-}
-
-export interface IMeshClass {
-    new (): IMesh;
-}
-
 
 /**
  * Interface for Component
@@ -89,18 +81,6 @@ export interface ISystem extends IUpdatable {
 
 export interface ISystemClass {
     new (): ISystem;
-}
-
-/**
- * Renderer
- */
-
-export interface IRenderer extends IUpdatable {
-    onRender: () => void;
-}
-
-export interface IRendererClass {
-    new (): IRenderer;
 }
 
 /**
@@ -141,7 +121,7 @@ export interface IGameMode extends IUpdatable {
 }
 
 export interface IGameModeClass {
-    new (): IGameMode;
+    new (config: Object): IGameMode;
 }
 
 /**
@@ -179,57 +159,26 @@ export interface IGame extends IUpdatable {
 }
 
 export interface IGameClass {
-    new (): IGame;
+
+    clientClasses: Array<IUpdatableClass>;
+
+    systemClasses: Array<ISystemClass>;
+
+    configObjects: Array<Object>;
+
+    new (config:Object): IGame;
 }
 
 /**
- *
+ * Runtime interface
  */
 
-export interface IGameClient {
-    gameEngine: IGame;
-}
+export interface IRuntime {
 
-export interface IGameClinentClass {
-    new (): IGameClient;
-}
+    start: ()=> void;
 
+    stop: ()=> void;
 
-/**
- *
- */
+    reset: ()=> void;
 
-export interface IGameServer {
-    gameEngine: IGame;
-}
-
-export interface IGameServerClass {
-    new (): IGameServer;
-}
-
-// todo move to impl
-export function bootstrapClient(game: IGameClass): IGameClient {
-    return null;
-}
-
-export function bookstrapServer(game: IGameClass): IGameServer {
-    return null;
-}
-
-export function systems(arr:Array<ISystemClass>) {
-    return (target: IGameClass) => {
-
-    }
-}
-
-export function renderers(arr:Array<IRendererClass>) {
-    return (target: IGameClass) => {
-
-    }
-}
-
-export function defaults(obj:Object) {
-    return () => {
-
-    }
 }

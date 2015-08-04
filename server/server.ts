@@ -3,7 +3,7 @@
 
 import app = require('./app');
 import io = require('./io');
-import Game = require('../common/game');
+import Game = require('../game/squidGame');
 
 var PORT = process.env.PORT || 3000;
 var SOCKET = process.env.SOCKET || 3001;

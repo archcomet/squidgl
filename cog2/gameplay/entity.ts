@@ -5,8 +5,6 @@ import {
     IComponent,
     IComponentClass,
     IController,
-    IMesh,
-    IMeshClass,
     IVector3
 } from './interfaces';
 
@@ -25,33 +23,19 @@ export class Entity implements IEntity {
 
     private components: Array<IComponent> = [];
 
-    constructor() {
-        // todo
+    constructor(config:Object) {
+        // todo impl
         console.log('hello entity');
     }
 
     getComponent (ComponentClass:IComponentClass): IComponent {
-        // todo
+        // todo impl
         return null;
     }
 
     hasComponents (...ComponentClasses:Array<IComponentClass>): boolean {
-        // todo
+        // todo impl
         return false;
     }
 
-}
-
-
-export function components (arr:Array<IComponentClass>) {
-    return (target: IEntityClass) => {
-
-        console.log(target);
-    }
-}
-
-export function meshes (arr:Array<IMeshClass>) {
-    return (target: IEntityClass) => {
-
-    }
 }
