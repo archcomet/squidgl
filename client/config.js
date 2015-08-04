@@ -4,7 +4,8 @@ System.config({
     format: 'cjs',
     defaultJSExtensions: true,
     paths: {
-        'common/*': '../common/*.js'
+        'cog2/*': '../cog2/*',
+        'game/*': '../game/*'
     },
     map: {
         'text': 'libs/text',

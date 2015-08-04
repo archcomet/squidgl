@@ -1,4 +1,9 @@
 
+## re-implement meshes in game
+
+* squidGame (threeRenderer, squidGameMode)
+* squidGameMode (squidEntity) 
+* onStart spawns squidEntity
 
 ### game engine
 
