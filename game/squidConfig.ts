@@ -1,5 +1,6 @@
-export var config: Object = {
-    foo: {
 
+export var config: Object = {
+    threeRenderer: {
+        cameraType: "Orthographic"
     }
 };

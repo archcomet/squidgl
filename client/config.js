@@ -18,6 +18,6 @@ System.config({
     }
 });
 
-System.import('src/app').then(function(App) {
-    (new App()).start();
-});
+//System.import('src/app').then(function(App) {
+//    (new App()).start();
+//});

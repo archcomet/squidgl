@@ -1,9 +1,17 @@
 
 ## re-implement meshes in game
 
+* system types
+* component types
+
+* threeRenderer - create scene, find container
+* threeMesh - add to scene (or another mesh)
+* entity - e
+
 * squidGame (threeRenderer, squidGameMode)
 * squidGameMode (squidEntity) 
 * onStart spawns squidEntity
+* mesh position copy from entity vector
 
 ### game engine
 
