@@ -14,7 +14,8 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(compression());
 app.use('/client', express.static(clientPath));
-app.use('/common', express.static(commonPath));
+app.use('/cog2', express.static(commonPath));
+app.use('/game', express.static(commonPath));
 
 app.get('/', (req, res) => {
     res.redirect('client/index.html');

@@ -5,7 +5,8 @@ export class GameMode implements IGameMode {
 
     public state: IGameState;
 
-    constructor(config:Object) {}
+    constructor(config:Object) {
+    }
 
     spawn (EntityClass: IEntityClass): IEntity {
         // todo impl

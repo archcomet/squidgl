@@ -1,6 +1,7 @@
 
 import { Game, configs, systems } from 'cog2/cog2';
 import { ThreeRenderer, renderers } from 'cog2/renderer';
+import { SquidGameMode } from 'game/squidGameMode';
 
 import squidConfig = require('game/squidConfig');
 
@@ -12,6 +13,8 @@ import squidConfig = require('game/squidConfig');
     ThreeRenderer
 ])
 
-class SquidGame extends Game {}
+class SquidGame extends Game {
+    defaultGameModeClass = SquidGameMode;
+}
 
 export = SquidGame;

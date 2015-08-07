@@ -52,7 +52,7 @@ export interface IEntity extends IUpdatable {
 }
 
 export interface IEntityClass {
-    new (): IEntity;
+    new (config:Object): IEntity;
 }
 
 

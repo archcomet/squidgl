@@ -28,8 +28,8 @@ export class ThreeRenderer extends Renderer {
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
 
-        this.container.appendChild(this.renderer.domElement);
         this.container = document.getElementById('container');
+        this.container.appendChild(this.renderer.domElement);
 
         window.addEventListener('resize', () => {
 

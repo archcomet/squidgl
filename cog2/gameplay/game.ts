@@ -30,7 +30,9 @@ export class Game implements IGame {
 
     private _state: IGameStateClass;
 
-    constructor(config:Object) {}
+    constructor(config:Object) {
+        this.setGameMode(this.defaultGameModeClass);
+    }
 
     loadState (json: Object, GameStateClass?: IGameStateClass): void {
         // todo impl
