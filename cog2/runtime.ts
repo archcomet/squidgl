@@ -41,7 +41,7 @@ class Runtime implements IRuntime {
     }
 
     public start ():void {
-
+        this.game.onStart(this.game.gameMode);
     }
 
     public stop ():void {

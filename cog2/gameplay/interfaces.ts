@@ -146,9 +146,9 @@ export interface IGameStateClass {
 
 export interface IGame extends IUpdatable {
 
-    defaultGameModeClass: IGameModeClass;
+    config: any;
 
-    defaultGameStateClass: IGameStateClass;
+    gameMode: IGameMode;
 
     loadState: (json: Object, GameStateClass?: IGameStateClass) => void;
 
@@ -160,13 +160,17 @@ export interface IGame extends IUpdatable {
 
 export interface IGameClass {
 
+    defaultGameModeClass: IGameModeClass;
+
+    defaultGameStateClass: IGameStateClass;
+
     clientClasses: Array<IUpdatableClass>;
 
     systemClasses: Array<ISystemClass>;
 
     configObjects: Array<Object>;
 
-    new (config:Object): IGame;
+    new (config:any): IGame;
 }
 
 /**

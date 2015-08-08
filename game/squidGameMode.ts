@@ -7,6 +7,6 @@ export class SquidGameMode extends GameMode {
     onStart(gameMode:SquidGameMode) {
 
         var squidEntity = gameMode.spawn(SquidEntity);
-        console.log(squidEntity);
+        console.log('START', squidEntity);
     }
 }
