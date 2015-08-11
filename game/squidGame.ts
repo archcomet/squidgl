@@ -1,22 +1,11 @@
-
-import { Game, configs, systems, defaults, IGameDefaults } from 'cog2/cog2';
-import { ThreeRenderer, renderers } from 'cog2/renderer';
-import { SquidGameMode } from 'game/squidGameMode';
-
-import squidConfig = require('game/squidConfig');
-
-@configs([
-    squidConfig
-])
-
-@renderers([
-    ThreeRenderer
-])
+import { Game, defaults } from 'cog2/cog2';
+import { SquidWorld } from './gameplay/squidWorld';
+import { config } from './squidConfig';
 
 @defaults({
-    defaultGameModeClass:  SquidGameMode
+    defaultConfig: config,
+    defaultGameWorldClass: SquidWorld
 })
 
-class SquidGame extends Game {}
-
-export = SquidGame;
+export class SquidGame extends Game {
+}

@@ -1,7 +1,12 @@
+import App = require('src/app');
+let global = <any>window;
+global.app = new App();
+global.app.start();
+
 
 import { bootstrap } from 'cog2/cog2';
-import SquidGame = require('game/squidGame');
+import { SquidGame } from 'game/squidGame';
 
-let global = <any>window;
-
-global.squidApp = bootstrap(SquidGame);
+global.squidGame = bootstrap(SquidGame, {
+    number: 42
+});

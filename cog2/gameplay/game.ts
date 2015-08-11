@@ -1,85 +1,79 @@
+/// <reference path="../cog2.d.ts" />
 
-import {
-    IGame,
-    IGameClass,
-    IGameStateClass,
-    IGameMode,
-    IGameModeClass,
-    ISystemClass,
-    IUpdatableClass
-} from './interfaces';
+import { extend } from 'cog2/utils/lang';
+import { GameState } from 'cog2/gameplay/gameState';
+import { GameWorld } from 'cog2/gameplay/gameWorld';
 
-import {extend} from '../lang';
+/**
+ * defaults
+ *
+ * Decorates IGameClass with default options.
+ *
+ * @param options
+ * @returns {function(IGameClass): undefined}
+ */
 
-import {GameMode} from './gameMode';
-import {GameState} from './gameState';
+export function defaults(options:{
+    defaultConfig?: any,
+    defaultGameWorldClass?: IGameWorldClass,
+    defaultGameStateClass?: IGameStateClass
+}) {
+    return function (targetClass:IGameClass) {
+
+        if (options.defaultConfig) {
+            targetClass.defaultConfig = options.defaultConfig;
+        }
+
+        if (options.defaultGameStateClass) {
+            targetClass.defaultGameStateClass = options.defaultGameStateClass;
+        }
+
+        if (options.defaultGameWorldClass) {
+            targetClass.defaultGameWorldClass = options.defaultGameWorldClass;
+        }
+    }
+}
+
+/**
+ * Game Class
+ *
+ * Runtime for the Game. Manages game world and systems.
+ */
 
 export class Game implements IGame {
 
-    static defaultGameModeClass: IGameModeClass = GameMode;
+    static defaultConfig:any;
 
-    static defaultGameStateClass: IGameStateClass = GameState;
+    static defaultGameWorldClass:IGameWorldClass = GameWorld;
 
-    static get clientClasses (): Array<IUpdatableClass> {
-        return [];
-    }
+    static defaultGameStateClass:IGameStateClass = GameState;
 
-    static get systemClasses (): Array<ISystemClass> {
-        return [];
-    }
+    public config:any;
 
-    static get configObjects (): Array<Object> {
-        return [];
-    }
-
-    public config: any;
-
-    public gameMode: IGameMode;
-
-    private _state: IGameStateClass;
+    public world:IGameWorld;
 
     constructor(config:any) {
-        this.config = extend(true, {}, config);
-        this.setGameMode((<IGameClass>this.constructor).defaultGameModeClass);
+        let GameClass:IGameClass = <IGameClass>this.constructor;
+
+        this.config = extend(true, {}, GameClass.defaultConfig, config);
+        this.setWorld(GameClass.defaultGameWorldClass, GameClass.defaultGameStateClass);
+
+        // todo start timer
     }
 
-    loadState (json: Object, GameStateClass?: IGameStateClass): void {
-        // todo impl
-    }
-
-    saveState (): Object {
-        // todo impl
-        return this._state;
-    }
-
-    setGameMode (GameModeClass: IGameModeClass) {
-        // todo stop previous game mode via runtime
-        this.gameMode = new GameModeClass(this.config);
-        console.log(this.gameMode);
-    }
-
-    onStart (gameMode: IGameMode) {
-
-        if (this.gameMode.onStart) {
-            this.gameMode.onStart(gameMode);
+    destroy() {
+        if (this.world) {
+            this.world.destroy();
+            this.world = null;
         }
     }
-}
 
-export function configs(configObjects:Array<Object>) {
-    return (targetClass:IGameClass) => {
-        for(let config of configObjects) {
-            targetClass.configObjects.push(config);
+    setWorld(WorldClass:IGameWorldClass, StateClass:IGameStateClass) {
+        if (this.world) {
+            this.world.destroy();
         }
-    }
-}
 
-export function defaults(defaultOptions: {
-    defaultGameModeClass?: IGameModeClass,
-    defaultGameStateClass?: IGameStateClass
-}) {
-    return (TargetClass:IGameClass) => {
-        TargetClass.defaultGameModeClass = defaultOptions.defaultGameModeClass || TargetClass.defaultGameModeClass;
-        TargetClass.defaultGameStateClass = defaultOptions.defaultGameStateClass || TargetClass.defaultGameStateClass;
+        this.world = new WorldClass(this.config, StateClass);
     }
+
 }

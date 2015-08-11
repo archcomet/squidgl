@@ -1,4 +1,8 @@
 .DS_Store
 .idea/
+_cog2/
 typings/
 node_modules/
+
+cog2/**/*.js*
+game/**/*.js*

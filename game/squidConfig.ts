@@ -1,6 +1,3 @@
-
-export var config: Object = {
-    threeRenderer: {
-        cameraType: "Orthographic"
-    }
+export var config = {
+    message: "The world is square!"
 };

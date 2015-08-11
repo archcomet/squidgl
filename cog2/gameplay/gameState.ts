@@ -1,15 +1,10 @@
-
-import {IGameState} from './interfaces';
+/// <reference path="../cog2.d.ts" />
 
 export class GameState implements IGameState {
 
-    serialize (): Object {
-        // todo impl
-        return {}
+    constructor(config:any) {
     }
 
-    deserialize (json:Object) {
-        // todo impl
+    destroy() {
     }
-
 }

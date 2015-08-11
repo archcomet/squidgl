@@ -1,5 +1,3 @@
-
-
 /**
  * Merge the contents of two or more objects together into the first object.
  *
@@ -8,7 +6,7 @@
  * @param objectN Additional objects containing properties to merge in.
  */
 
-export function extend(target: any, object1?: any, ...objectN: any[]): any;
+export function extend(target:any, object1?:any, ...objectN:any[]):any;
 
 /**
  * Merge the contents of two or more objects together into the first object.
@@ -19,9 +17,9 @@ export function extend(target: any, object1?: any, ...objectN: any[]): any;
  * @param objectN Additional objects containing properties to merge in.
  */
 
-export function extend(deep: boolean, target: any, object1?: any, ...objectN: any[]): any;
+export function extend(deep:boolean, target:any, object1?:any, ...objectN:any[]):any;
 
-export function extend(deepOrTarget?: any, ...objects: any[] ):any {
+export function extend(deepOrTarget?:any, ...objects:any[]):any {
 
     var options, key, src, copy, copyIsArray, clone,
         target = arguments[0] || {},
@@ -44,7 +42,7 @@ export function extend(deepOrTarget?: any, ...objects: any[] ):any {
         i--;
     }
 
-    for(; i < n; ++i) {
+    for (; i < n; ++i) {
         if ((options = arguments[i]) != null) {
             for (key in options) {
                 //noinspection JSUnfilteredForInLoop
@@ -172,10 +170,10 @@ export function isPlainObject(obj:any):boolean {
         return false;
     }
     try {
-        if (obj.constructor && !Object.prototype.hasOwnProperty.call( obj.constructor.prototype, "isPrototypeOf" ) ) {
+        if (obj.constructor && !Object.prototype.hasOwnProperty.call(obj.constructor.prototype, "isPrototypeOf")) {
             return false;
         }
-    } catch ( e ) {
+    } catch (e) {
         return false;
     }
     return true;
