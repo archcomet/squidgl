@@ -2,9 +2,8 @@
 
 export class GameState implements IGameState {
 
-    constructor(config:any) {
-    }
+    constructor(config: any) {}
 
-    destroy() {
-    }
+    destroy() {}
+
 }

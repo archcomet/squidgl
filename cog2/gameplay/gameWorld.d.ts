@@ -4,9 +4,14 @@ interface IGameWorld {
 
     state: IGameState;
 
-    destroy: ()=>void;
+    destroy: ()=> void;
+
 }
 
 interface IGameWorldClass {
-    new (config:any, StateClass:IGameStateClass): IGameWorld
+
+    defaultGameStateClass: IGameStateClass;
+
+    new (config: any): IGameWorld
+
 }

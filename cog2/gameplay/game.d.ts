@@ -4,18 +4,16 @@ interface IGame {
 
     config: any;
 
-    destroy: ()=>void;
+    destroy: ()=> void;
 
-    setWorld: (WorldClass:IGameWorldClass, StateClass:IGameStateClass)=>void;
+    setWorld: (WorldClass: IGameWorldClass, StateClass: IGameStateClass) => void;
 }
 
 interface IGameClass {
 
     defaultConfig: any;
 
-    defaultGameStateClass: IGameStateClass;
-
     defaultGameWorldClass: IGameWorldClass;
 
-    new (config:any): IGame
+    new (config: any): IGame
 }

@@ -1,9 +1,9 @@
 /// <reference path="../cog2.d.ts" />
 
 interface IGameState {
-    destroy: ()=>void;
+    destroy: ()=> void;
 }
 
 interface IGameStateClass {
-    new (config:any): IGameState
+    new (config: any): IGameState
 }

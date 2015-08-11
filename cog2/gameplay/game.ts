@@ -1,11 +1,12 @@
 /// <reference path="../cog2.d.ts" />
 
 import { extend } from 'cog2/utils/lang';
+import { Actor } from 'cog2/gameplay/actor';
 import { GameState } from 'cog2/gameplay/gameState';
 import { GameWorld } from 'cog2/gameplay/gameWorld';
 
 /**
- * defaults
+ * settings
  *
  * Decorates IGameClass with default options.
  *
@@ -13,23 +14,23 @@ import { GameWorld } from 'cog2/gameplay/gameWorld';
  * @returns {function(IGameClass): undefined}
  */
 
-export function defaults(options:{
+export function settings(options:{
     defaultConfig?: any,
     defaultGameWorldClass?: IGameWorldClass,
     defaultGameStateClass?: IGameStateClass
 }) {
-    return function (targetClass:IGameClass) {
+    return function (targetClass: IGameClass) {
 
         if (options.defaultConfig) {
             targetClass.defaultConfig = options.defaultConfig;
         }
 
-        if (options.defaultGameStateClass) {
-            targetClass.defaultGameStateClass = options.defaultGameStateClass;
-        }
-
         if (options.defaultGameWorldClass) {
             targetClass.defaultGameWorldClass = options.defaultGameWorldClass;
+        }
+
+        if (options.defaultGameStateClass) {
+            targetClass.defaultGameWorldClass.defaultGameStateClass = options.defaultGameStateClass;
         }
     }
 }
@@ -40,40 +41,46 @@ export function defaults(options:{
  * Runtime for the Game. Manages game world and systems.
  */
 
-export class Game implements IGame {
+export class Game extends Actor implements IGame {
 
-    static defaultConfig:any;
+    static defaultConfig: any;
 
-    static defaultGameWorldClass:IGameWorldClass = GameWorld;
+    static defaultGameWorldClass: IGameWorldClass = GameWorld;
 
-    static defaultGameStateClass:IGameStateClass = GameState;
+    config: any;
 
-    public config:any;
+    world: IGameWorld;
 
-    public world:IGameWorld;
-
-    constructor(config:any) {
-        let GameClass:IGameClass = <IGameClass>this.constructor;
+    constructor(config: any) {
+        super();
+        let GameClass: IGameClass = <IGameClass> this.constructor;
 
         this.config = extend(true, {}, GameClass.defaultConfig, config);
-        this.setWorld(GameClass.defaultGameWorldClass, GameClass.defaultGameStateClass);
+        this.setWorld(GameClass.defaultGameWorldClass);
 
-        // todo start timer
+        this.start();
     }
 
     destroy() {
+        this.onEnd(this.world);
         if (this.world) {
             this.world.destroy();
             this.world = null;
         }
+        super.destroy.call(this);
     }
 
-    setWorld(WorldClass:IGameWorldClass, StateClass:IGameStateClass) {
+    setWorld(WorldClass: IGameWorldClass) {
         if (this.world) {
             this.world.destroy();
         }
 
-        this.world = new WorldClass(this.config, StateClass);
+        this.world = new WorldClass(this.config);
+    }
+
+    private start() {
+
+        this.onStart(this.world);
     }
 
 }

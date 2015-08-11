@@ -1,15 +1,24 @@
 /// <reference path="../cog2.d.ts" />
 
-export class GameWorld implements IGameWorld {
+import { Actor } from './actor';
+import { GameState } from './gameState';
+
+export class GameWorld extends Actor implements IGameWorld {
+
+    static defaultGameStateClass: IGameStateClass = GameState;
 
     state: IGameState;
 
-    constructor(config:any, StateClass:IGameStateClass) {
-        this.state = new StateClass(config);
+    constructor(config: any) {
+        super();
+        let GameWorldClass: IGameWorldClass = <IGameWorldClass> this.constructor;
+        this.state = new GameWorldClass.defaultGameStateClass(config);
     }
 
     destroy() {
         this.state.destroy();
         this.state = null;
+        super.destroy.call(this);
     }
+
 }
