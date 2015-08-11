@@ -1,6 +1,6 @@
 /// <reference path="../cog2.d.ts" />
 
-interface IGame {
+interface IGame extends IActor {
 
     config: any;
 
@@ -12,6 +12,8 @@ interface IGame {
 interface IGameClass {
 
     defaultConfig: any;
+
+    defaultInterval: number;
 
     defaultGameWorldClass: IGameWorldClass;
 

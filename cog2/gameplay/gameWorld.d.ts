@@ -1,6 +1,8 @@
 /// <reference path="../cog2.d.ts" />
 
-interface IGameWorld {
+interface IGameWorld extends IActor {
+
+    config: any;
 
     state: IGameState;
 
