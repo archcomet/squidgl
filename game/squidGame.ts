@@ -7,4 +7,6 @@ import { config } from './squidConfig';
     defaultGameWorldClass: SquidWorld
 })
 
-export class SquidGame extends Game {}
+export class SquidGame extends Game {
+
+}

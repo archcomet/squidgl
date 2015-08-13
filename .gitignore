@@ -4,5 +4,8 @@ _cog2/
 typings/
 node_modules/
 
+client/bootstrap.js*
+client/src/**/*.js*
 cog2/**/*.js*
 game/**/*.js*
+server/**/*.js*

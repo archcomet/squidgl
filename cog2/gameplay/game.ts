@@ -15,7 +15,7 @@ import { GameWorld } from 'cog2/gameplay/gameWorld';
  * @returns {function(IGameClass): undefined}
  */
 
-export function settings(options:{
+export function settings(options: {
     defaultConfig?: any,
     defaultInterval?: number,
     defaultGameWorldClass?: IGameWorldClass,

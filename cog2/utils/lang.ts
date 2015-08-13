@@ -1,3 +1,15 @@
+
+export var Type = Function;
+
+export interface Type extends Function { new (...args): any; }
+
+interface Global {
+    Reflect: any
+}
+
+var _global: Global = <any>(typeof window === 'undefined' ? global : window);
+export { _global as global };
+
 /**
  * Merge the contents of two or more objects together into the first object.
  *
