@@ -2,17 +2,18 @@ import { global, Type } from 'cog2/utils/lang';
 
 var Reflect = global.Reflect;
 
-export function makeDecorator(annotationCls): (...args) => (cls: any) => any {
-    function DecoratorFactory(annotationArgs): (cls: any) => any {
-        var annotationInst = new annotationCls(annotationArgs);
-        function TypeDecorator(targetCls: Type) {
-            var annotations = Reflect.get(targetCls, 'annotations');
-            annotations = annotations || [];
-            annotations.push(annotationInst);
-            Reflect.set(targetCls, 'annotations', annotations);
+export function makeDecorator(cogCls): (...args) => ClassDecorator {
+    function DecoratorFactory(...cogArgs): ClassDecorator {
+        cogArgs.splice(0, 0, cogCls);
+
+        return (targetCls: Type) => {
+            var cogs = Reflect.get(targetCls, 'cogs');
+            cogs = cogs || [];
+            cogs.push(cogArgs);
+            Reflect.set(targetCls, 'cogs', cogs);
             return targetCls;
-        }
-        return TypeDecorator;
+        };
+
     }
     return DecoratorFactory;
 }

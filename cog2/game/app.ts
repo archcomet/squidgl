@@ -8,4 +8,9 @@ export class AppAnnotation {
     }
 }
 
+export class AppRef {
+
+}
+
+
 export var App : AppFactory = <AppFactory> makeDecorator(AppAnnotation);
